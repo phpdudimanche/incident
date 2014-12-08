@@ -14,6 +14,20 @@
     - exigences,
     - référentiel de test.
 
+## Optimisé pour le code :
+- Les pages ont vocation à être en nombre limitées : pas de répertoire afin de vérifier ce principe.
+- Le code est en POO PDO.
+- La répartition logique des pages par bloc métier est :
+- - ClassMetier.php         fonctions display incluse
+- - PageMetier_form.php     formulaire de création et modification
+- - PageMetier_act.php      script de traitement : Create Update Delete, et affichage d'alertes
+- - PageMetier_list.php     script de traitement at affichage : Retrieve avec options pour listing, détails. 
+
+## Optimisé pour le métier :
+- Inspiré de Mantis en retenant l'essentiel.
+- Version 0 sans multiprojet : une installation par projet.
+- Version 0 sans paramétrage par IHM ni adaptation aux catégories.
+
 ## Installation :
 - Les scripts sql sont fournis.
 - Le fichier de configuration "_config.php" est à renommer "config.php".
