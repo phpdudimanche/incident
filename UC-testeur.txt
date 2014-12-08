@@ -1,0 +1,23 @@
+Titre : gérer un incident jusqu'à son terme
+Acteur principal : testeur
+Parties prenantes et intérêt :
+    Le test manager souhaite des informations fiables et utiles afin d'identifier des effets de levier.
+    L'auteur du livrable souhaite ne pas être insulté mais aidé à monter en compétence par des retours d'information pertinents.
+    Le métier désire par dessus tout être informé des conditions précises qui nuisent à la qualité du logiciel et être assuré de la bonne prise en compte de ses préoccupations.
+Garanties de succès : l'incident est analysé pour améliorer la qualité du logiciel et du test
+Garanties minimales : l'incident est consigné et suivi par excel
+
+Chemin nominal :
+Le testeur consigne un incident depuis le livrable qu'il manipule et des informations sont automatiquement transmises au gestionnaire d'incident qui s'ouvre automatiquement pour que le testeur puisse vérifier et compléter sa saisie.
+Le testeur ne remplit que peu de champs compléméntaires et que des champs qu'il est en état de remplir, afin de pouvoir rapidement consigner l'incident et de recevoir par mail la confirmation de création et le lien permanent vers la page de suivi.
+Le testeur reçoit par mail les changements de statut sur son incident, ainsi que des alertes pour des événements jugés préoccupants.
+Le testeur se logge également à intervalle régulier sur son tableau de bord afin de suivre ce qui l'intéresse : les incidents qu'il a consigné, le périmètre qu'il surveille ou et qui lui est assigné. Dès que le testeur réalise une action de la liste, il revient à la liste.
+Le testeur peut répondre à tout moment aux questions que lui pose son manager, le métier,ou quiconque concernant les incidents. Le testeur peut rechercher un incident par son identifiant, un mot clé ou catégorie, et exporter un incident ou une liste pour preuve, ou une synthèse graphique de l'état des incidents et des actions réalisées.
+Le testeur gère un incident à son terme, aidé par les scripts de contrôle du système : incident sans défaut ni cause racine consignée, incident sans notification des actions de retour d'expérience (nouveau cas de test, réévaluation des risques). Le système met à part les incidents menés à terme et considérés au statut fermé afin de ne pas polluer les actions futures du testeur.
+Le testeur peut exporter la liste complète des incidents jugés légitimes sur une période et démontrer les économies qu'il a aidé à réaliser (si le testeur a activé et rempli des champs tels que "retour sur investissement").
+
+Variantes de données et de techniques :
+- Le testeur consigne un incident depuis :
+    une exigence étudiée dans un gestionnaire d'exigence (l'interface récupère l'exigence, la version, le statut de l'exigence numéro, le type d'exigence, l'identification du testeur)
+    un cas de test dans un référentiel de test (l'interface récupère le projet,l'application, le module, la condition de test, le risque de la condition,le cas de test, le risque pondéré du cas de test, et depuis la condition de test l'exigence - voir plus haut -, l'identification du testeur)
+    un pas de test exécuté dans un référentiel de test (l'interface récupère les pas de test en mettant l'accent sur celui qui échoue, met en avant attendu obtenu et données, récupère version/suite de test/session)
