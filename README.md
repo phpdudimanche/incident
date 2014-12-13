@@ -19,11 +19,11 @@
 - Les pages ont vocation à être en nombre limité : pas de répertoire afin de vérifier ce principe.
 - Le code est en POO PDO.
 - La répartition logique des pages par bloc métier est :
-    - ClassMetier.php         fonctions display incluse
+    - ClassMetier.php         fonctions display incluses
     - PageMetier_form.php     formulaire de création et modification
     - PageMetier_act.php      script de traitement : Create Update Delete, et affichage d'alertes
     - PageMetier_list.php     script de traitement at affichage : Retrieve avec options pour listing, détails. 
-- Les pages type header, footer, side, à vocation de template pour inclusion son nommées _PAGE.php.
+- Les pages type header, footer, side, à vocation de template pour inclusion son nommées _page.php.
 
 ## Optimisé pour le métier :
 - Inspiré de Mantis en retenant l'essentiel.
