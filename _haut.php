@@ -14,4 +14,18 @@ print("
 ?>
     </head>
 <body>
+<?php
+// @todo de l'intérêt d'avoir un controleur, un seul si affichage modif _form ou visu _list
+$return="<form name='rechercher_id_incident' id='rechercher_id_incident' action='incident_act.php' method='post'>
+         <input type='hidden' name='act' id='act'value='search_id'>
+         <input type='text' size='3' value='id' id='id' name='id' onFocus='javascript:this.value=\"\"'>
+         <input type='submit' value=\"chercher l'incident\" />
+         ";
+echo $return;
+$links="
+<a href='incident_list.php'>Liste des incidents (par défaut)</a>
+</form>
+";// fonction de lien libelles
+echo $links;
+?>
 

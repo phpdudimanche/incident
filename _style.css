@@ -1,3 +1,7 @@
 body{background-color:#E5E5E5}
-label{display:block;float:left;width:7em;text-align:right;margin-right:1em;}
+a:link,a:visited{text-decoration:none;color:#0000EE;}
+a:hover{text-decoration:underline;}
+a:active{color:black;}
+dt,label{display:block;float:left;width:7em;text-align:right;margin-right:1em;}
+dd{display:inline-block;width:40em;text-align:left;margin-right:1em;}/* mais descend si ecran etroit */
 input[type="submit"]{color:red}

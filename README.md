@@ -9,7 +9,8 @@
 - Chercher la valeur ajoutée différenciatrice des autres outils du même type.
 - Pour le reste, prévoir plus tard des interfaces xmlrpc pour les gestionnaires de :
     - lotissement projet,
-    - version et traçabilité,
+    - version de code source
+    - et traçabilité documentaire,
     - risque,
     - exigences,
     - référentiel de test.
