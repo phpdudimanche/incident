@@ -39,8 +39,8 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     $incident->display_vue_incident($result);
     }
 }
-elseif($act=='recherche_avancee'){
-    // WHERE ... AND ...
+elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout est intégré
+/*    // WHERE ... AND ...
     echo "severite avant:";
     print_r($severite);// OR si plusieurs a l'interieur
     echo "<br />urgence avant:";
@@ -52,7 +52,7 @@ elseif($act=='recherche_avancee'){
     print($tri_urgence);
     echo "<br /><br />";
     // transmission : array(where,order_by);
-    
+*/    
     //---- preparation : WHERE
     // $where=array('severite'=>$severite,'urgence'=>$urgence);
     // si une valeur est vide, retirer OPTIMISATION
@@ -63,8 +63,8 @@ elseif($act=='recherche_avancee'){
     if($urgence!=''){
         $where['urgence']=$urgence;
     }
-    echo "<br />retravail WHERE:";
-    print_r($where);
+//echo "<br />retravail WHERE:";
+//print_r($where);
     
     //---- preparation : ORDERBY
    // $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
@@ -75,15 +75,15 @@ elseif($act=='recherche_avancee'){
     if($tri_urgence!=''){
         $orderby['urgence']=$tri_urgence;
     }
-    echo '<br />retravail ORDERBY:',
-    print_r($orderby);
-    echo '<br />';
+//echo '<br />retravail ORDERBY:',
+//print_r($orderby);
+//echo '<br />';//@todo offrir la possibilité de trimballer les optionspour :remplir le formulaire de recherche (avec possibilité d'effacer)
     
     
      /** seconde partie de la requete apres les champs, le filtre
       * 
       */
-     function requete_personnalisee_where($where){
+     function requete_personnalisee_where($where){//@test les deux, le 1er, le dernier, et variatioon en multiple = 6 tests
          //echo "<br />";
          //print_r($where);
          //--- WHERE
@@ -120,9 +120,9 @@ elseif($act=='recherche_avancee'){
          return $return;
      }
      $result1=requete_personnalisee_where($where);
-     echo "<br />Requete WHERE";
-     print($result1);
-     echo "<br />";
+//echo "<br />Requete WHERE";
+//print($result1);
+//echo "<br />";
      function requete_personnalisee_orderby($orderby){
          $taille=sizeof($orderby);
          $i=0;
@@ -146,9 +146,9 @@ elseif($act=='recherche_avancee'){
          return $return;
      }
      $result2=requete_personnalisee_orderby($orderby);
-     echo "<br />Requete ORDERBY";
-     print($result2);
-     echo "<br />";
+//echo "<br />Requete ORDERBY";
+//print($result2);
+//echo "<br />";
      /*
      pouvoir l'enregistrer, cad :
      V-00 la récupérer en array (au premier jeu)
@@ -175,17 +175,61 @@ elseif($act=='recherche_avancee'){
             $return.="$result2";
      }      
             return $return;
-     } 
-     
+     }
      $result=requete_where_order($result1,$result2);
-     echo "<br />Requete presque complete : ".$result;
-     
+//echo "<br />Requete presque complete : ".$result;
+     /** requete non preparee pour aller plus vite ?
+      * @todo requete préparée
+      */
+     function recherche_personnalisee($con,$where,$orderby){
+         try{
+           // 0/ connexion : con
+           // 1/ requete
+           $query="SELECT * FROM incident ";
+           $personnalisation=requete_where_order($where,$orderby);
+           $query.=$personnalisation;
+           // 4/ envoi
+           //$appel=$con->query($query);
+                $appel=$con->prepare($query);
+                    if($appel->execute()){
+                    $nombre=$appel->rowCount();//@bug FIXE pas pour SELECT, ou alors en PREPARE par execute
+                    //$return=$nombre;
+                    }else{
+                        die('KO');
+                    }
+                if($nombre>0){
+                    //$return='OK '.$nombre;
+                    $return=$appel->fetchall();
+                }
+                else{
+                    $return=$nombre.' : aucun enregistrement';
+                }
+           return $return;
+         }
+         catch (Exception $e){
+             echo "erreur au select";
+         }
+     }
     
+    $requete=recherche_personnalisee($con,$result1,$result2);
+//echo "<br />requete finie: ";
+//print_r($requete);// tolere d'afficher du texte
+    if(is_array($requete)){// pour éviter de traiter du vide !
+    $incident->display_admin_n_incident($requete);
+    }
+    else{
+        echo "Aucun résultat.";
+    }
 }
 else{
    // echo "rien de prévu ?";
 $result=$incident->retrieve_n_incident($con);
+    if(is_array($result)){
 $incident->display_admin_n_incident($result);
+    }
+    else{
+        echo "Aucun résultat.";
+    }
 }
     require_once '_bas.php';
 ?>

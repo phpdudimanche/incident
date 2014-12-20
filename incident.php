@@ -143,14 +143,14 @@
         echo "Erreur: " . $exception->getMessage();
     }   
       }
-      function retrieve_n_incident($con){
+      function retrieve_n_incident($con){//@todo remanier cette requete par défaut
       try{
   
         // 0/ connexion
         // 1/ requete
         $query="SELECT * FROM incident";
-    $query.=" WHERE (severite= ? OR severite= ?)";// :name or ? MAIS melange impossible
-   $query.=" AND (urgence= ? OR urgence= ?)";
+    /*$query.=" WHERE (severite= ? OR severite= ?)";// :name or ? MAIS melange impossible sert dexemple : ok
+   $query.=" AND (urgence= ? OR urgence= ?)";*/
     $query.=" ORDER BY severite DESC, urgence DESC";
         
         // 2/ étape préparation
@@ -158,14 +158,14 @@
                 // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
         $stmt->setFetchMode(PDO::FETCH_ASSOC);// FETCH_OBJ FETCH_CLASS,'incident' sort tous les param de la classe, et pas mieux !
         // 3/ binder, passer les paramètres
-    $urgence=20;
+    /*$urgence=20;
     $urg_2=30;
     $severite=40;
     $sev_2=10;
     $stmt->bindParam(1, $severite, PDO::PARAM_INT);
     $stmt->bindParam(2, $sev_2);
     $stmt->bindParam(3, $urgence);
-    $stmt->bindParam(4, $urg_2);
+    $stmt->bindParam(4, $urg_2);*/
         // 4/ exécution, envoi de la requete
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
@@ -251,7 +251,8 @@
        */
  function display_admin_n_incident($array){
           $nombre=sizeof($array);
-          echo "<p>".$nombre.' incidents | ';
+          $label=($nombre>1)?"incidents":"incident";// gérer le pluriel
+          echo "<p>".$nombre." ".$label." | ";
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
           for($i=0;$i<$nombre;$i++){
           $label_severite=$this->annoncer_severite($array[$i]['severite']);
