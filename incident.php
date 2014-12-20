@@ -146,11 +146,23 @@
         // 0/ connexion
         // 1/ requete
         $query="SELECT * FROM incident";
+    $query.=" WHERE (severite= ? OR severite= ?)";// :name or ? MAIS melange impossible
+   $query.=" AND (urgence= ? OR urgence= ?)";
+    $query.=" ORDER BY severite DESC, urgence DESC";
+        
         // 2/ étape préparation
         $stmt =$con->prepare($query);
                 // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
         $stmt->setFetchMode(PDO::FETCH_ASSOC);// FETCH_OBJ FETCH_CLASS,'incident' sort tous les param de la classe, et pas mieux !
         // 3/ binder, passer les paramètres
+    $urgence=20;
+    $urg_2=30;
+    $severite=40;
+    $sev_2=10;
+    $stmt->bindParam(1, $severite, PDO::PARAM_INT);
+    $stmt->bindParam(2, $sev_2);
+    $stmt->bindParam(3, $urgence);
+    $stmt->bindParam(4, $urg_2);
         // 4/ exécution, envoi de la requete
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
@@ -232,16 +244,19 @@
       }
 //----------------------- méthodes d'affichage --------------------------
       /** présentation du listing + header et footer
-       * 
+       * $type (admin avec liens modif / visiteur sans action)
        */
       function display_admin_n_incident($array){
           $nombre=sizeof($array);
           echo "<p>".$nombre.' incidents | ';
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
           for($i=0;$i<$nombre;$i++){
+          $label_severite=$this->annoncer_severite($array[$i]['severite']);
+          $label_urgence=$this->annoncer_urgence($array[$i]['urgence']);
               echo "<p><label>&nbsp;</label>";
                   echo $array[$i]['id']." : "; 
                   echo $array[$i]['resume'];
+                  echo " : ".$label_severite." - ".$label_urgence;
                   echo " : <a href='incident_list.php?act=view&id=".$array[$i]['id']."'>voir</a>";
              // echo "<a href='incident_list.php?act=view&id=".$array[$i]['id']."'>".$array[$i]['resume']."</a>";
               // si droit de modification : 
@@ -336,6 +351,26 @@
  function choisir_severite($name,$selected){
   $array=$this->severite_list;
   $return=$this->presente_select($array,$name,$selected);
+  return $return;
+ }
+ /** 
+  * ATTENTION, il peut y avoir plusieurs selected !
+  */
+ function choisir_avancee($type,$name){
+  $la_liste=$type.'_list';// impossible à utiliser de suite : provoque erreur
+  $array=$this->$la_liste;
+  
+  $return='
+  <p class="severite"><label class="utile">
+  '.$name.' : ';
+  //$return.='<a href="#fermer" class="mini">fermer</a>';// haut
+ // $return.='</label><label class="utile">';
+  $return.='<input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="asc" title="asc">
+  <input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="desc" title="desc" ></label>';// problème des labels for
+      foreach($array as $key => $value){
+      $return.='<label><input type="checkbox" name="'.$type.'['.$key.']" />'.$value.'</label><br />';
+      }
+  $return.='</p>'; // bas
   return $return;
  }
  function choisir_urgence($name,$selected){

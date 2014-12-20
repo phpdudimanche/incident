@@ -5,3 +5,21 @@ a:active{color:black;}
 dt,label{display:block;float:left;width:7em;text-align:right;margin-right:1em;}
 dd{display:inline-block;width:40em;text-align:left;margin-right:1em;}/* mais descend si ecran etroit */
 input[type="submit"]{color:red}
+#listing{display:none;text-align:right;}
+label{display:block;float:left;width:180px;color:black;}
+input[type="checkbox"]{float:right;}
+input[type="radio"]{vertical-align:middle;margin-bottom:0.3em;}
+label:hover{background-color:#C0C0C0;}
+label.utile{font-weight:bold;}
+label.utile:hover{background-color:#E5E5E5}
+.severite{display:block;width:180px;float:left;}
+.urgence{display:block;width:180px;float:left;}
+.action{display:block;width:90px;float:left;}
+#listing:target{display:block;}/* z-index:100 */
+/*#fermer:target{}*/
+.mini{font-weight:normal;}
+hr{clear:both;visibility:hidden;}
+h1{clear:both}/* permet de ne pas décaler le titre lors de la recherche_avancee */
+/*input[type="radio"]{display:none;}
+input[type="radio"] + label{cursor: pointer;background-image:url(icon_down_sort_arrow.png) left center no-repeat;content:"asc"}
+*/
