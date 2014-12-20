@@ -43,61 +43,58 @@ elseif($act=='recherche_avancee'){
     // WHERE ... AND ...
     echo "severite avant:";
     print_r($severite);// OR si plusieurs a l'interieur
-    echo "<br />";
+    echo "<br />urgence avant:";
     print_r($urgence);
     // ORDER BY
+    echo "<br />tri severite avant:";
     print($tri_severite);
+    echo "<br />tri urgence avant:";
     print($tri_urgence);
+    echo "<br /><br />";
     // transmission : array(where,order_by);
     
-    // preparation
+    //---- preparation : WHERE
     // $where=array('severite'=>$severite,'urgence'=>$urgence);
     // si une valeur est vide, retirer OPTIMISATION
     $where=array();
-    
     if($severite!=''){
-        //array_push($where,'severite'=>$severite);
         $where['severite']=$severite;
     }
-    if($urgence!=''){// pas bonne solution elseif : non cumulable
-        //array_push($where,'urgence'=>$urgence;
+    if($urgence!=''){
         $where['urgence']=$urgence;
     }
-    echo "<br />retravail:";
+    echo "<br />retravail WHERE:";
     print_r($where);
     
+    //---- preparation : ORDERBY
+   // $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
+    $orderby=array();
+    if($tri_severite!=''){
+        $orderby['severite']=$tri_severite;
+    }
+    if($tri_urgence!=''){
+        $orderby['urgence']=$tri_urgence;
+    }
+    echo '<br />retravail ORDERBY:',
+    print_r($orderby);
+    echo '<br />';
     
     
-    
-    $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);
-        /*if($severite!='' OR $urgence!=''){
-            echo "severite urgence <br />";
-        }
-        else{
-            echo "ni severite ni urgence : pas de where specifique<br />";
-        }
-         if($tri_severite!='' OR $tri_urgence!=''){
-            echo "triseverite triurgence <br />";
-        }
-        else{
-            echo "ni triseverite ni triurgence : pas de order_by specifique<br />";
-        }*/
-     
-     print_r($orderby);
-     function requete_personnalisee($where,$orderby){
+     /** seconde partie de la requete apres les champs, le filtre
+      * 
+      */
+     function requete_personnalisee_where($where){
          //echo "<br />";
          //print_r($where);
          //--- WHERE
          $return="";
          $taille_1=sizeof($where);
          $a=0;
-         //$z=0;// controle au moins un element non vide
          //echo "taille ".$taille_1."<br />";
          foreach($where as $key=>$value){// tous les éléments du tableau N1
              $a++;
              //$return.=" a est ".$a."/ ";
              if($value!=''){// tant que tableau N2 n'est pas vide
-             //$z++;
                   $return.= "(";
                   //echo "tableau concernant ".$key."<br />"; 
                   $taille_2=sizeof($value);// compteur commence à 2
@@ -110,53 +107,48 @@ elseif($act=='recherche_avancee'){
                           $return.= " OR ";
                       }
                   }
-                  $return.= ")";
-                    //--- AND ici
-                    //$avant=prev($where);
+                  $return.= ")";//fin du tableau N2
                     $suivant=next($where);// anticipation de l'élément suivant
-                    //$return.='suivant '.printr($suivant).' // ';
-                    // mais il faut que l'élément suivant existe !
-                        /*if(!array_key_exists($suivant)){
-                            $return.="";
-                        }*/
                         if($suivant!=''){//@bug fixé en nettoyant l'envoi, pas de tableau vide
                         $return.= " AND ";// il faut qu'il y ait aussi eu un élément non vide avant
                         }
-                        //elseif()
                         else{
                             $return.="";
                         }
-                    
-             }
-                        
-         }
-         
-         /*
-         //--- ORDERBY
-         $taille_3=sizeof($orderby);
-         $b=0;
-         $c=0;// pour orderby
-         //return.='taille3 '.$taille_3;
-         foreach($orderby as $cle=>$valeur){
-             if($valeur!=''){
-                 $c++;
-                 $prochain=next($orderby);
-                        if($c==1){
-                          $return.=' ORDER BY ';// 1 seul ORDER BY au premier non vide 
-                        }
-                        elseif($c>0 AND $prochain!=''){
-                            $return.=', ';// 1 seule virgule tant que la suivant existe et est non vide
-                        }
-                 $return.=$cle.' '.$valeur;
              }
          }
-        */
-
          return $return;
      }
-     $result=requete_personnalisee($where,$orderby);
+     $result1=requete_personnalisee_where($where);
+     echo "<br />Requete WHERE";
+     print($result1);
      echo "<br />";
-     print($result);
+     function requete_personnalisee_orderby($orderby){
+         $taille=sizeof($orderby);
+         $i=0;
+         $return ="";
+         foreach($orderby as $cle=>$valeur){
+             $i++;
+            if($i==1 AND $i==$taille){// si une seule valeur, la valeur est la première et la dernière
+               //$return.="(" ;
+               $return.=$cle." ".$valeur; 
+               //$return.=")";
+            }
+            elseif($i==1){// premier
+               //$return.="(" ;
+               $return.=$cle." ".$valeur;
+            }
+            elseif($i==$taille){// fin
+                $return.=",".$cle." ".$valeur;
+                //$return.=")";
+            }
+         }
+         return $return;
+     }
+     $result2=requete_personnalisee_orderby($orderby);
+     echo "<br />Requete ORDERBY";
+     print($result2);
+     echo "<br />";
      /*
      pouvoir l'enregistrer, cad :
      V-00 la récupérer en array (au premier jeu)
@@ -165,6 +157,28 @@ elseif($act=='recherche_avancee'){
      la recherche est accessible par URL portant le nom
      - le propriétaire ou niveau d'accès sera à voir plus tard !
      */
+     //concatenation des 2 requetes
+     function requete_where_order($result1,$result2){
+            $return="";
+     if ($result1!="" AND $result2!=""){// optimal
+            $return.=" WHERE ";
+            $return.="$result1";
+            $return.=" ORDER BY ";
+            $return.="$result2";           
+     }
+     elseif($result1!=""){
+            $return.=" WHERE ";
+            $return.="$result1";
+     }
+     elseif($result2!=""){
+            $return.=" ORDER BY ";
+            $return.="$result2";
+     }      
+            return $return;
+     } 
+     
+     $result=requete_where_order($result1,$result2);
+     echo "<br />Requete presque complete : ".$result;
      
     
 }

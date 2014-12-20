@@ -31,36 +31,15 @@ echo $links;
 
 require_once 'incident.php';
 $incident=new incident;
-//$incident->display_form_recherche_avancee();
+
 
 echo '<form id="listing" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
-$severite_avancee=$incident->choisir_avancee('severite','sévérité');
+$severite_avancee=$incident->choisir_avancee('severite','sévérité');// chacune des colonnes
 print($severite_avancee);
 $urgence_avancee=$incident->choisir_avancee('urgence','urgence');
 print($urgence_avancee);
 echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
 
-/*
-print('
-<form id="listing">
-<p class="severite"><label class="utile">
-<input type="radio" name="tri_severite" id="tri_severite" value="asc" title="asc" checked><span></span><input type="radio" name="tri_severite" value="desc" title="desc" >
-sévérité : <a href="#fermer">fermer</a></label>
-<label><input type="checkbox" name="items[]" /> Best Practices</label><br />
-<label><input type="checkbox" name="items[]" /> Client Relationships</label><br />
-<label><input type="checkbox" name="items[]" checked="checked" /> Communications</label><br />
-<label><input type="checkbox" name="items[]" /> Compensation</label><br />
-<label><input type="checkbox" name="items[]" /> Contracts and Negotiations</label>
-</p>
-<p class="urgence"><label class="utile">urgence</label>
-<label><input type="checkbox" name="items[]" /> Best Practices</label><br />
-<label><input type="checkbox" name="items[]" /> Client Relationships</label><br />
-<label><input type="checkbox" name="items[]" checked="checked" /> Communications</label><br />
-<label><input type="checkbox" name="items[]" /> Compensation</label><br />
-<label><input type="checkbox" name="items[]" /> Contracts and Negotiations</label>
-</p>
-</form>
-');*/
 
 ?>
 

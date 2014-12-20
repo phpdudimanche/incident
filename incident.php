@@ -120,6 +120,9 @@
             echo "Erreur: " . $exception->getMessage();
         } 
       }
+      /** peut etre interdit a l'usage : juste statut supprimeS
+       *
+       */
       function delete_incident($con,$id){
           try{
         // 1/ requete
@@ -243,10 +246,10 @@
             }
       }
 //----------------------- méthodes d'affichage --------------------------
-      /** présentation du listing + header et footer
+ /** présentation du listing + header et footer
        * $type (admin avec liens modif / visiteur sans action)
        */
-      function display_admin_n_incident($array){
+ function display_admin_n_incident($array){
           $nombre=sizeof($array);
           echo "<p>".$nombre.' incidents | ';
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
@@ -266,10 +269,10 @@
           }
           
       }
-     /** formulaire de création // vocation à être différent d'un formulaire de modification ?!
+ /** formulaire de création // vocation à être différent d'un formulaire de modification ?!
       * 
       */
-     function display_crea_incident(){
+ function display_crea_incident(){
       
       $act="create";// à faire passer si formulaire mutualisé
   // si controle js des champs : onsubmit= fonction(); return false   
