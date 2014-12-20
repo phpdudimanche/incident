@@ -257,7 +257,7 @@
           for($i=0;$i<$nombre;$i++){
           $label_severite=$this->annoncer_severite($array[$i]['severite']);
           $label_urgence=$this->annoncer_urgence($array[$i]['urgence']);
-              echo "<p><label>&nbsp;</label>";
+              echo "<p><label class='vide'>&nbsp;</label>";
                   echo $array[$i]['id']." : "; 
                   echo $array[$i]['resume'];
                   echo " : ".$label_severite." - ".$label_urgence;
@@ -279,9 +279,9 @@
   // si controle js des champs : onsubmit= fonction(); return false   
 	 $return="
 	 		<form name='instance_incident' id='instance_incident' action='incident_act.php' method='post'><input type='hidden' name='act' id='act' value='$act'>
-			<p><label for='resume'>Résumé : </label><input type='text' name='resume' id='resume' size='70' value='le titre vaut résumé' onFocus='javascript:this.value=\"\"'></p>";
+			<p><label class='vide' for='resume'>Résumé : </label><input type='text' name='resume' id='resume' size='70' value='le titre vaut résumé' onFocus='javascript:this.value=\"\"'></p>";
 			
-			 $return.="<p><label>&nbsp;</label>";
+			 $return.="<p><label class='vide'>&nbsp;</label>";
 			$name='severite';// v0 si nom du champ transmis / v1 réécriture du nom comme url
    $selected='';
 			$return.=$this->choisir_severite($name,$selected);
@@ -291,8 +291,8 @@
    $return.=$this->choisir_urgence($name,$selected);
      $return.="</p>";
 			
-			$return.="<p><label for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description' onfocus='javascript:this.value = \"\"' onsubmit='javascript:this.value = \"\"'>ce qui ne serait pas rapporté d'un autre outil</textarea></p>
-			<p><label>&nbsp;</label><input type='submit' value=\"rapporter l'incident\" /></p>
+			$return.="<p><label class='vide' for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description' onfocus='javascript:this.value = \"\"' onsubmit='javascript:this.value = \"\"'>ce qui ne serait pas rapporté d'un autre outil</textarea></p>
+			<p><label class='vide'>&nbsp;</label><input type='submit' value=\"rapporter l'incident\" /></p>
 			</form>
 	 ";
  return $return; 
@@ -307,9 +307,9 @@
   // si controle js des champs : onsubmit= fonction(); return false   
 	 $return="
 	 		<form name='instance_incident' id='instance_incident' action='incident_act.php' method='post'><input type='hidden' name='act' id='act' value='$act'><input type='hidden' name='id' id='id' value='$id'>
-			<p><label for='resume'>Résumé : </label><input type='text' name='resume' id='resume' size='70' value='".$resume."'></p>";
+			<p><label class='vide' for='resume'>Résumé : </label><input type='text' name='resume' id='resume' size='70' value='".$resume."'></p>";
 			
-			 $return.="<p><label>&nbsp;</label>";
+			 $return.="<p><label class='vide'>&nbsp;</label>";
 			$name='severite';// v0 si nom du champ transmis / v1 réécriture du nom comme url
    $selected=$severite;// recup
 			$return.=$this->choisir_severite($name,$selected);
@@ -319,8 +319,8 @@
    $return.=$this->choisir_urgence($name,$selected);
      $return.="</p>";
 			
-			$return.="<p><label for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description'>".$description."</textarea></p>
-			<p><label>&nbsp;</label><input type='submit' value=\"rapporter l'incident\" /></p>
+			$return.="<p><label class='vide' for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description'>".$description."</textarea></p>
+			<p><label class='vide'>&nbsp;</label><input type='submit' value=\"rapporter l'incident\" /></p>
 			</form>
 	 ";
  return $return;      
