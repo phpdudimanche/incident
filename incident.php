@@ -5,67 +5,18 @@
  require_once 'config.php';
  class incident{
      
-     public $id_incident;
+     public $id;
      public $resume;// résumé vaut titre
+     public $description;//tout commentaire utile...
      
-     public $id_statut_actuel;// dernier statut (déjà en historique ?) / pour date création, récupérer celle dupremier statut
-     public $severite_test;// mineur, majeur, bloquant // le risque peut être récupéré de "condition de test/cas de test"
-     public $severite_metier;// à détecter en création selon qui se logge
+     public $severite;
      public $urgence;
      
-     public $severite_list=array(10=>'mineur',20=>'moyen',30=>'majeur',40=>'bloquant');
-    private $urgence_list=array(10=>'non urgent',20=>'urgent',30=>'immédiat');
-     
-     public $tracabilite_projet;// projet/module... (possible import outil projet)
-     public $tracabilite_test;// condition de test, cas de test
-     public $tracabilite_exigence;// citation, id reference (possible gestionnaire exigence, outil documentaire)
-     public $tracabilite_risque;// possible (gestionnaire de risque)
-     public $tracabilite_registre_de_test;// jointure table de pièce jointe pour preuve
-     
-     public $version;// versionning (possible import gestion de configuration)
-     public $procedure;// steps (possible import référentiel de test)
-     public $donnees;// (possible import référentiel de test)
-     public $attendu;// (possible import référentiel de test)
-     
-     public $description;//tout commentaire utile...
-     /* possible template à charger par projet
-     ATTENDU :    OBTENU :  
-     ACTIONS : 
-     DONNEES : 
-     
-     APPLICATION :  LIVRABLE :  VERSION : DATE : 
-     */
-     
-     public $id_proprietaire;// suivre jusqu'au bout ?
+     private $severite_list=array(10=>'mineur',20=>'moyen',30=>'majeur',40=>'bloquant');//@todo mettre en _config.php
+     private $urgence_list=array(10=>'non urgent',20=>'urgent',30=>'immédiat');//@todo mettre en _config.php
 
-    
-     public $phase_detection;// LOV (pouvoir tester la maîtrise de phase)
-     public $phase_introduction;// LOV
-     public $activite_detection;//LOV (pouvoir rapprocher du type statique ou dynamique)
-     public $activite_introduction;// LOV
-     
-     public $defaillance;
-     public $defaut;
-     public $erreur;
-     public $type_defaut;// LOV
-     public $type_erreur;// 
-     
-    /** maitrise de phase
-     *  v0 O/N  v1 combien de niveaux d'écarts (d'après la lov)
-     * 
-     */
-     function maitrise_de_phase($phase_detection,$phase_introduction){
-      $return=($phase_detection==$phase_introduction)?1:0;
-      return $return;
-     }
-     /** statique ou dynamique
-      * + autre fonction : faire le ratio
-      */
-     function type_technique(){
-         
-     }
-     
-     /** scripts CRUD
+//----------------------- méthodes CRUD -------------------------------
+      /** scripts CRUD
       * @todo la connexion vient polluer la méthode
       */
       function create_incident($con,$resume,$description,$severite,$urgence){
@@ -120,7 +71,7 @@
             echo "Erreur: " . $exception->getMessage();
         } 
       }
-      /** peut etre interdit a l'usage : juste statut supprimeS
+      /** peut etre interdit a l'usage (ou autorise qu'a l'admin) : juste statut supprime
        *
        */
       function delete_incident($con,$id){
@@ -333,8 +284,8 @@
         <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
         </dl><br />");}
- /** liste deroulante
-  * 
+ /** 
+  * @todo mettre en fonctions utile
   */
  function presente_select($array,$name,$selected){
    	$return= '<select name="'.$name.'" size="1">';
@@ -358,7 +309,7 @@
   return $return;
  }
  /** 
-  * ATTENTION, il peut y avoir plusieurs selected !
+  * @todo mettre en fonctions utile
   */
  function choisir_avancee($type,$name){
   $la_liste=$type.'_list';// impossible à utiliser de suite : provoque erreur
