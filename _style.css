@@ -17,6 +17,12 @@ label.utile{font-weight:bold;}
 .urgence{display:block;width:150px;float:left;}
 .action{display:block;width:90px;float:left;}
 #listing:target{display:block;}/* z-index:100 */
+/* tableau de display admin */
+table, td{border:2px}
+tr:hover{background-color:#C0C0C0;}
+.id{width:40px;}
+.resume{width:500px;}
+.crud{width:200px;}
 /*#fermer:target{}*/
 .mini{font-weight:normal;}
 hr{clear:both;visibility:hidden;}

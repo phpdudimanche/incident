@@ -203,23 +203,30 @@
  function display_admin_n_incident($array){
           $nombre=sizeof($array);
           $label=($nombre>1)?"incidents":"incident";// gérer le pluriel
-          echo "<p>".$nombre." ".$label." | ";
+          echo "<div id=''><p>".$nombre." ".$label." | ";// mise en page
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
+    echo "<table>";
           for($i=0;$i<$nombre;$i++){
           $label_severite=$this->annoncer_severite($array[$i]['severite']);
           $label_urgence=$this->annoncer_urgence($array[$i]['urgence']);
-              echo "<p><label class='vide'>&nbsp;</label>";
+              //echo "<p><label class='vide'>&nbsp;</label><span class=''>";// mise en page
+    echo "<tr><td class='id'>";
                   echo $array[$i]['id']." : "; 
+    echo "</td><td class='resume'>";
                   echo $array[$i]['resume'];
+    echo "</td><td class='statuts'>";
                   echo " : ".$label_severite." - ".$label_urgence;
+    echo "</td><td class='crud'>";
                   echo " : <a href='incident_list.php?act=view&id=".$array[$i]['id']."'>voir</a>";
              // echo "<a href='incident_list.php?act=view&id=".$array[$i]['id']."'>".$array[$i]['resume']."</a>";
               // si droit de modification : 
               echo " | <a href='incident_form.php?act=update&id=".$array[$i]['id']."'>modifier</a>";
               echo " | <a href='incident_act.php?act=delete&id=".$array[$i]['id']."'>supprimer</a>";
-              echo "</p>";
+              //echo "</span></p>";
+    echo "</td></tr>";
           }
-          
+          //echo '</div>';
+    echo "</table>";
       }
  /** formulaire de création // vocation à être différent d'un formulaire de modification ?!
       * 
