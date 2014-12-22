@@ -22,8 +22,7 @@ print("
 
 if ($act=='list'){// liste de N incidents
 $result=$incident->retrieve_n_incident($con);
-        if($debug===1){
-            echo '<br/>debug:'.$debug;
+        if($debug===1){//DEBUG non genant
         echo '<pre>';
         print_r($result);
         echo '</pre>';
@@ -37,7 +36,11 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     echo 'Aucun incident avec cet identifiant.';
     }
     else{
-    //print_r($result);
+        if($debug===1){//DEBUG non genant
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        }
     $incident->display_vue_incident($result);
     }
 }
@@ -68,8 +71,10 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     if($statut!=''){
         $where['statut']=$statut;
     }
-//echo "<br />retravail WHERE:";
-//print_r($where);
+if ($debug===1){
+echo "<br />retravail WHERE:";
+print_r($where);
+}
     
     //---- preparation : ORDERBY
    // $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
@@ -83,10 +88,11 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     if($tri_statut!=''){
         $orderby['statut']=$tri_statut;
     }
-//echo '<br />retravail ORDERBY:',
-//print_r($orderby);
-//echo '<br />';//@todo offrir la possibilité de trimballer les optionspour :remplir le formulaire de recherche (avec possibilité d'effacer)
-    
+if ($debug===1){
+echo '<br />retravail ORDERBY:';
+print_r($orderby);
+//@todo offrir la possibilité de trimballer les optionspour :remplir le formulaire de recherche (avec possibilité d'effacer)
+}   
     
      /** seconde partie de la requete apres les champs, le filtre
       * 
@@ -128,9 +134,10 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
          return $return;
      }
      $result1=requete_personnalisee_where($where);
-/*echo "<br />Requete WHERE";
+if($debug===1){
+echo "<br />Requete WHERE";
 print($result1);
-echo "<br />";*/
+}
      function requete_personnalisee_orderby($orderby){
          $taille=sizeof($orderby);
          $i=0;
@@ -154,10 +161,11 @@ echo "<br />";*/
          return $return;
      }
      $result2=requete_personnalisee_orderby($orderby);
-/*echo "<br />Requete ORDERBY";
-print($result2);
-exit();*/
-//echo "<br />";
+        if($debug===1){
+        echo "<br />Requete ORDERBY ";
+        print($result2);
+        echo "<br />";
+        }
      /*
      pouvoir l'enregistrer, cad :
      V-00 la récupérer en array (au premier jeu)
@@ -186,6 +194,11 @@ exit();*/
             return $return;
      }
      $result=requete_where_order($result1,$result2);
+        if($debug===1){//DEBUG non genant
+        echo 'requete concatenee :';
+        print($result);
+        echo '<br />';
+        }
 //echo "<br />Requete presque complete : ".$result;
      /** requete non preparee pour aller plus vite ?
       * @todo requete préparée
@@ -230,6 +243,12 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
     $requete=recherche_personnalisee($con,$result1,$result2);
 //echo "<br />requete finie: ";
 //print_r($requete);// tolere d'afficher du texte
+        if($debug===1){//DEBUG non genant
+        echo '<pre>';
+        print_r($requete);
+        echo '</pre>';
+        }
+
     if(is_array($requete)){// pour éviter de traiter du vide !
     $incident->display_admin_n_incident($requete);
     }
@@ -240,9 +259,14 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
 else{
    // echo "rien de prévu ?";
 $result=$incident->retrieve_n_incident($con);
-//print_r($result);
+        if($debug===1){//DEBUG non genant
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        }
+
     if(is_array($result)){
-$incident->display_admin_n_incident($result);
+     $incident->display_admin_n_incident($result);
     }
     else{
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed

@@ -234,15 +234,15 @@ $query.=" AND i.id=:id";
        * $type (admin avec liens modif / visiteur sans action)
        */
  function display_admin_n_incident($array){
-     global $statut_list;// param.php
+     global $statut_list,$severite_list,$urgence_list;// param.php
           $nombre=sizeof($array);
           $label=($nombre>1)?"incidents":"incident";// gérer le pluriel
           echo "<div id=''><p>".$nombre." ".$label." | ";// mise en page
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
     echo "<table>";
           for($i=0;$i<$nombre;$i++){
-          $label_severite=$this->annoncer_severite($array[$i]['severite']);
-          $label_urgence=$this->annoncer_urgence($array[$i]['urgence']);
+          $label_severite=afficher_statut($array[$i]['severite'],$severite_list);//$this->annoncer_severite($array[$i]['severite']);
+          $label_urgence=afficher_statut($array[$i]['urgence'],$urgence_list);//$this->annoncer_urgence($array[$i]['urgence']);
           $label_statut=afficher_statut($array[$i]['statut'],$statut_list);
               //echo "<p><label class='vide'>&nbsp;</label><span class=''>";// mise en page
     echo "<tr><td class='id'>";
@@ -327,9 +327,10 @@ $query.=" AND i.id=:id";
  return $return;      
  }
  function display_vue_incident($result){
-     global $statut_list;
-    $severite_label=$this->annoncer_severite($result[0]['severite']);//@todo harmoniser : array-result urgence_label, label_urgence
-    $urgence_label=$this->annoncer_urgence($result[0]['urgence']);
+     global $statut_list,$urgence_list,$severite_list;
+    //$severite_label=$this->annoncer_severite($result[0]['severite']);//@todo harmoniser : array-result urgence_label, label_urgence
+    $severite_label=afficher_statut($result[0]['severite'],$severite_list);
+    $urgence_label=afficher_statut($result[0]['urgence'],$urgence_list);//$this->annoncer_urgence($result[0]['urgence']);
     $statut_label=afficher_statut($result[0]['statut'],$statut_list);
     print("<dl>
         <p><dt>Résumé :</dt><dd>".$result[0]['resume']."</dd></p>

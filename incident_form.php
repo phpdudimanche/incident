@@ -23,7 +23,11 @@ echo $form_creation;
 elseif($act=="update"){
  // query select fetch  
 $result=$incident->retrieve_id_incident($con,$id);
-//print_r($result);
+        if($debug===1){//DEBUG non genant
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        }
 $id=$result[0]['id'];
 $resume=$result[0]['resume'];
 $statut=$result[0]['statut'];

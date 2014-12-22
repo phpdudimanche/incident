@@ -48,8 +48,10 @@
      */
     function  afficher_statut($key,$array){
     // $array=$this->severite_list; directement passé
+     if($array!=''){// parfois non rempli, passé alors en ''
      $return=(array_key_exists($key,$array))?$array[$key]:'';// sans cela, avec clé inexistante : message Undefined offset: 0
      return $return;
+     }
     }
 
 ?>
