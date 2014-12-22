@@ -1,5 +1,7 @@
 <?php
-$debug=1;//0 rien, 1 affichage, 2 logs
+$debug=0;//0 rien, 1 affichage, 2 logs
+require_once 'lib.php';// fonctions utiles
+require_once 'param.php';// paramètres de configuration fine : règles métiers
 
 //--- paramètres de connexion
     $host = getHostByName(getHostName()); 'localhost';
