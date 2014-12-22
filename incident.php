@@ -23,34 +23,55 @@
        
        try{
         // 0/ appel de la connexion
+$con->beginTransaction();
+
         // 1/ requête
-        $query = "INSERT INTO incident SET resume= ?, description = ?, severite = ?, urgence = ?";
-        //@todo mettre le statut à nouveau 10 
+        $query = "INSERT INTO incident SET resume= :resume, description = :description, severite = :severite, urgence = :urgence";
         // 2/ étape préparation
-        $stmt = $con->prepare($query);
+$stmt = $con->prepare($query);
         // 3/ binder, passer les paramètres
-        $stmt->bindParam(1, $resume);
-        $stmt->bindParam(2, $description);
-        $stmt->bindParam(3, $severite);
-        $stmt->bindParam(4, $urgence);
-        // 4/ exécution, envoi de la requete
+        $stmt->bindParam(':resume', $resume);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':severite', $severite);
+        $stmt->bindParam(':urgence', $urgence);
+         if($stmt->execute()){
+        $nombre=$stmt->rowCount();
+            //echo "OK ".$nombre." traitement";
+        }else{
+            die('KO 1er');
+        }  
+        
+        // requete
+        $query="INSERT INTO statut SET id_incident=:id_incident, statut=:statut, date=:date";
+        // preparation
+$stmt = $con->prepare($query);
+        // assignation
+        $id_incident=$con->lastInsertId();//@todo à surveiller !
+        $statut=10;//@todo mettre le statut à nouveau 10
+        $date = date("YmdHis");//$date=20141006000000;
+        $stmt->bindParam(':id_incident', $id_incident);
+        $stmt->bindParam(':statut', $statut);
+        $stmt->bindParam(':date',$date);
+        // remplacement des variables
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
             //echo "OK ".$nombre." traitement";
         }else{
-            die('KO');
+            die('KO 2nd');
         }
+        
+        
+$con->commit();
     }catch(PDOException $exception){ //capture d'erreur
+$con->rollback();
         echo "Erreur: " . $exception->getMessage();
     }
-
    // echo "create !";
-    
-       
       }
-      function update_incident($con,$id,$resume,$description,$severite,$urgence){
+      function update_incident($con,$id,$resume,$description,$statut,$severite,$urgence){
       try{// seul $query change comparé à create ! + $id
         // 0/ appel de la connexion
+$con->beginTransaction();        
         // 1/ requête
         $query = "UPDATE incident SET resume= ?, description = ?, severite = ?, urgence = ? WHERE id = ?";
         // 2/ étape préparation
@@ -68,6 +89,28 @@
         }else{
             die('KO execution');
         }
+        
+        // si le statut change on crée un événment en statut
+        if($statut!=''){
+            $query="INSERT INTO statut SET id_incident=:id_incident, statut=:statut, date=:date";
+            $statut=$statut;
+            $id_incident=$id;
+            $date = date("YmdHis");
+            $stmt = $con->prepare($query);
+            $stmt->bindParam(':id_incident',$id);
+            $stmt->bindParam(':statut',$statut);
+            $stmt->bindParam(':date',$date);
+            if($stmt->execute()){// execute(array($resume,$description,$severite,$urgence,$id))
+                                $nombre=$stmt->rowCount();
+                                    //echo "OK ".$nombre." traitement";
+                                }else{
+                                    die('KO execution');
+                                }
+        }
+        else{
+            
+        }
+$con->commit();        
     }catch(PDOException $exception){ //capture d'erreur
             echo "Erreur: " . $exception->getMessage();
         } 
@@ -78,17 +121,18 @@
       function delete_incident($con,$id){
           try{
         // 1/ requete
-        $sql = "DELETE FROM incident WHERE id =  :id";
+        $sql = "DELETE FROM incident WHERE id =:id";
         // 2/ preparation
         $stmt = $con->prepare($sql);
         // 3/ passage des parametres
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id);//, PDO::PARAM_INT
         // 4/ exécution, envoi de la requete
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
-            // echo "OK ".$nombre." suppression effective ";
+            echo "OK ".$nombre." suppression effective ";
            
         }else{
+            echo "pb";
                die('KO');
             }
     }catch(PDOException $exception){ //capture d'erreur
@@ -99,25 +143,23 @@
       try{
   
         // 0/ connexion
-        // 1/ requete
-        $query="SELECT * FROM incident";
-    /*$query.=" WHERE (severite= ? OR severite= ?)";// :name or ? MAIS melange impossible sert dexemple : ok
-   $query.=" AND (urgence= ? OR urgence= ?)";*/
-    $query.=" ORDER BY severite DESC, urgence DESC";
-        
+        // 1/ requete SELECT * FROM incident ORDER BY statut ASC, severite DESC, urgence DESC
+        //$query="SELECT * FROM incident";// initialement
+$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
+$query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
+$query.=" FROM incident i";
+$query.=" JOIN statut s";
+$query.=" ON s.id_incident=i.id";
+$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
+$query.=" AND i.id!=''";
+$query.=" ORDER BY statut ASC, severite DESC, urgence DESC";
+        //$query.=" ORDER BY severite DESC, urgence DESC";// initialement
+    //@todo recuperer le dernier statut (tous,celamultiplierait les lignes)
         // 2/ étape préparation
         $stmt =$con->prepare($query);
-                // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
+        // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
         $stmt->setFetchMode(PDO::FETCH_ASSOC);// FETCH_OBJ FETCH_CLASS,'incident' sort tous les param de la classe, et pas mieux !
         // 3/ binder, passer les paramètres
-    /*$urgence=20;
-    $urg_2=30;
-    $severite=40;
-    $sev_2=10;
-    $stmt->bindParam(1, $severite, PDO::PARAM_INT);
-    $stmt->bindParam(2, $sev_2);
-    $stmt->bindParam(3, $urgence);
-    $stmt->bindParam(4, $urg_2);*/
         // 4/ exécution, envoi de la requete
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
@@ -125,46 +167,36 @@
         }else{
             die('KO');// fait un return ?
         }  
-  
-  // requete non preparee
-  //$select = $con->query("SELECT * FROM incident");
-  // On indique que nous utiliserons les résultats en tant qu'objet
-  //$select->setFetchMode(PDO::FETCH_OBJ);
-  //$nombre=$select->rowCount();
-  //echo $nombre.' enregistrement|';
-     if($nombre>0)
-     {  
-           // Nous traitons les résultats en boucle 
-           // mieux de séparer faire fetchall et mettre en tableau 
-           // puis traiter tableau (test unitaire + indépendance présentation, json...)
-          /*while( $enregistrement = $stmt->fetch() )// $select->fetch()
-          {
-            // Affichage des enregistrements
-            echo '<h1>', $enregistrement->id, '|', $enregistrement->resume, '</h1>';
-          }*/
-          
-        $result = $stmt->fetchAll();
-        /*echo '<pre>';
-        print_r($result);
-        echo '</pre>';*/
-        return $result;
-     }
-     else{
-    // echo 'aucun enregistrement|'; 
-      }
+         if($nombre>0)
+         {  
+             $result = $stmt->fetchAll();
+            /*echo '<pre>';
+            print_r($result);
+            echo '</pre>';*/
+            return $result;
+         }
+         else{
+        // echo 'aucun enregistrement|'; 
+          }
             } 
             catch ( Exception $e ) {
               echo "Une erreur est survenue lors de la récupération";
             }
-//
-//echo "read !|";
       }
       function retrieve_id_incident($con,$id){
           try{
   
         // 0/ connexion
         // 1/ requete
-        $query="SELECT * FROM incident WHERE id= :id";
+        //$query="SELECT * FROM incident WHERE id= :id";// initialement
+$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
+$query.=", s.statut, s.date";//, s.id as evenement sinon conflit entre id
+$query.=" FROM incident i";
+$query.=" JOIN statut s";
+$query.=" ON s.id_incident=i.id";
+$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
+// ne gere pas les erreurs, si aucun statut existant
+$query.=" AND i.id=:id";        
         // 2/ étape préparation
         $stmt =$con->prepare($query);
                 // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
@@ -202,6 +234,7 @@
        * $type (admin avec liens modif / visiteur sans action)
        */
  function display_admin_n_incident($array){
+     global $statut_list;// param.php
           $nombre=sizeof($array);
           $label=($nombre>1)?"incidents":"incident";// gérer le pluriel
           echo "<div id=''><p>".$nombre." ".$label." | ";// mise en page
@@ -210,15 +243,16 @@
           for($i=0;$i<$nombre;$i++){
           $label_severite=$this->annoncer_severite($array[$i]['severite']);
           $label_urgence=$this->annoncer_urgence($array[$i]['urgence']);
+          $label_statut=afficher_statut($array[$i]['statut'],$statut_list);
               //echo "<p><label class='vide'>&nbsp;</label><span class=''>";// mise en page
     echo "<tr><td class='id'>";
-                  echo $array[$i]['id']." : "; 
+                  echo $array[$i]['id'].""; 
     echo "</td><td class='resume'>";
                   echo $array[$i]['resume'];
     echo "</td><td class='statuts'>";
-                  echo " : ".$label_severite." - ".$label_urgence;
+                  echo $label_severite." - ".$label_urgence." - ".$label_statut;
     echo "</td><td class='crud'>";
-                  echo " : <a href='incident_list.php?act=view&id=".$array[$i]['id']."'>voir</a>";
+                  echo "<a href='incident_list.php?act=view&id=".$array[$i]['id']."'>voir</a>";
              // echo "<a href='incident_list.php?act=view&id=".$array[$i]['id']."'>".$array[$i]['resume']."</a>";
               // si droit de modification : 
               echo " | <a href='incident_form.php?act=update&id=".$array[$i]['id']."'>modifier</a>";
@@ -260,7 +294,7 @@
  /** form de modif potentiellement différent de la creation : car visualisation des imports effectues, plus complet...
   * 
   */
- function display_modif_incident($id,$resume,$severite,$urgence,$description){
+ function display_modif_incident($id,$resume,$statut,$severite,$urgence,$description){
      //----- dépendances -----------
      global $statut_list;
      
@@ -281,7 +315,7 @@
    $return.=$this->choisir_urgence($name,$selected);
    $return.=" ";
        $name='statut';
-       $selected='';//@todo implémenter la table de donnée
+       $selected=$statut;//@todo implémenter la table de donnée
        $array=$statut_list;//param.php
    $return.=presente_select($array,$name,$selected);
      $return.="</p>";
@@ -293,11 +327,13 @@
  return $return;      
  }
  function display_vue_incident($result){
-    $severite_label=$this->annoncer_severite($result[0]['severite']);
+     global $statut_list;
+    $severite_label=$this->annoncer_severite($result[0]['severite']);//@todo harmoniser : array-result urgence_label, label_urgence
     $urgence_label=$this->annoncer_urgence($result[0]['urgence']);
+    $statut_label=afficher_statut($result[0]['statut'],$statut_list);
     print("<dl>
         <p><dt>Résumé :</dt><dd>".$result[0]['resume']."</dd></p>
-        <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label."</dd></p>
+        <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label." - ".$statut_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
         </dl><br />");}
  /** en formulaire de création et modification

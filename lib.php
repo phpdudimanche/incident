@@ -43,5 +43,13 @@
     $return.='</p>'; // bas
     return $return;
  }
+    /** afficher le statut
+     * 
+     */
+    function  afficher_statut($key,$array){
+    // $array=$this->severite_list; directement passé
+     $return=(array_key_exists($key,$array))?$array[$key]:'';// sans cela, avec clé inexistante : message Undefined offset: 0
+     return $return;
+    }
 
 ?>

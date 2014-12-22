@@ -17,6 +17,7 @@ isset($_REQUEST['act'])?$act=$_REQUEST['act']:$act='';
 $description=((isset($_POST['description']))AND($_POST['description']!="ce qui ne serait pas rapporté d'un autre outil"))?$_POST['description']:'';
 $severite=((isset($_POST['severite']))AND($_POST['severite']!=''))?$_POST['severite']:'';
 $urgence=((isset($_POST['urgence']))AND($_POST['urgence']!=''))?$_POST['urgence']:'';
+$statut=((isset($_POST['statut']))AND($_POST['statut']!=''))?$_POST['statut']:'';
 // $erreur ou exception cumulée avec liste oubli
 
 /** @todo n'eut pas été nécessaire avec un contrôleur : pour la redirection, pas de sortie écran avant : 
@@ -49,12 +50,13 @@ elseif($act=='delete'){
     echo "<a href='incident_act.php?act=delete_confirm&id=".$id."'>supprimer</a>";
 }
 elseif($act=='delete_confirm'){
+     echo "<p>Supprimer id : ".$id."</p>";
      $incident->delete_incident($con,$id);
-     header('location:incident_list.php');
+     //header('location:incident_list.php');
 }
 elseif($act=='update'){
   //script mise à jour
-  $incident->update_incident($con,$id,$resume,$description,$severite,$urgence);
+  $incident->update_incident($con,$id,$resume,$description,$statut,$severite,$urgence);
   // détecter si retourne un message (return) ou rien (void) pour voir s'il y a lieu de faire une redirection
   header('location:incident_list.php');// fera de toute façon une erreur !
   

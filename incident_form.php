@@ -26,10 +26,11 @@ $result=$incident->retrieve_id_incident($con,$id);
 //print_r($result);
 $id=$result[0]['id'];
 $resume=$result[0]['resume'];
+$statut=$result[0]['statut'];
 $severite=$result[0]['severite'];
 $urgence=$result[0]['urgence'];
 $description=$result[0]['description'];
-$form_modification=$incident->display_modif_incident($id,$resume,$severite,$urgence,$description);
+$form_modification=$incident->display_modif_incident($id,$resume,$statut,$severite,$urgence,$description);
 echo $form_modification;
 }
 else{

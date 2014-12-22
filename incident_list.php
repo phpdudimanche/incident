@@ -56,7 +56,7 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     // transmission : array(where,order_by);
 */    
     //---- preparation : WHERE
-    // $where=array('severite'=>$severite,'urgence'=>$urgence);
+    // $where=array('severite'=>$severite,'urgence'=>$urgence,'statut'=>$statut);
     // si une valeur est vide, retirer OPTIMISATION
     $where=array();
     if($severite!=''){
@@ -128,9 +128,9 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
          return $return;
      }
      $result1=requete_personnalisee_where($where);
-//echo "<br />Requete WHERE";
-//print($result1);
-//echo "<br />";
+/*echo "<br />Requete WHERE";
+print($result1);
+echo "<br />";*/
      function requete_personnalisee_orderby($orderby){
          $taille=sizeof($orderby);
          $i=0;
@@ -154,9 +154,9 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
          return $return;
      }
      $result2=requete_personnalisee_orderby($orderby);
-//echo "<br />Requete ORDERBY";
-//print($result2);
-//exit();
+/*echo "<br />Requete ORDERBY";
+print($result2);
+exit();*/
 //echo "<br />";
      /*
      pouvoir l'enregistrer, cad :
@@ -170,13 +170,13 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
      function requete_where_order($result1,$result2){
             $return="";
      if ($result1!="" AND $result2!=""){// optimal
-            $return.=" WHERE ";
+            $return.=" AND ";// WHERE avant
             $return.="$result1";
             $return.=" ORDER BY ";
             $return.="$result2";           
      }
      elseif($result1!=""){
-            $return.=" WHERE ";
+            $return.=" AND ";// WHERE avant
             $return.="$result1";
      }
      elseif($result2!=""){
@@ -194,7 +194,14 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
          try{
            // 0/ connexion : con
            // 1/ requete
-           $query="SELECT * FROM incident ";
+           //$query="SELECT * FROM incident ";// initialement
+$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
+$query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
+$query.=" FROM incident i";
+$query.=" JOIN statut s";
+$query.=" ON s.id_incident=i.id";
+$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
+//$query.=" AND i.id!=''";
            $personnalisation=requete_where_order($where,$orderby);
            $query.=$personnalisation;
            // 4/ envoi
@@ -227,17 +234,18 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     $incident->display_admin_n_incident($requete);
     }
     else{
-        echo "Aucun résultat.";
+        echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
     }
 }
 else{
    // echo "rien de prévu ?";
 $result=$incident->retrieve_n_incident($con);
+//print_r($result);
     if(is_array($result)){
 $incident->display_admin_n_incident($result);
     }
     else{
-        echo "Aucun résultat.";
+        echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
     }
 }
     require_once '_bas.php';

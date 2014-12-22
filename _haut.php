@@ -3,9 +3,8 @@
     <head>
         <meta charset="utf-8" />
 <?php
-ini_set('display_errors', 1); 
-error_reporting(E_ALL); 
-//phpinfo();//trouver le php.ini : non accessible : /etc/php5/apache2/php.ini
+//ini_set('display_errors', 1); 
+//error_reporting(E_ALL); 
 $style='_style.css';
 print("        
         <title>$title</title>
@@ -32,16 +31,14 @@ echo $links;
 require_once 'incident.php';
 $incident=new incident;
 
-
 echo '<form id="listing" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
-$statut_avancee=choisir_avancee('statut','statut');
-print($statut_avancee);
 $severite_avancee=$incident->choisir_avancee('severite','sévérité');// chacune des colonnes
 print($severite_avancee);
 $urgence_avancee=$incident->choisir_avancee('urgence','urgence');
 print($urgence_avancee);
+$statut_avancee=choisir_avancee('statut','statut');
+print($statut_avancee);
 echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
-
 
 ?>
 
