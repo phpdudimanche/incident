@@ -45,19 +45,24 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     }
 }
 elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout est intégré
-/*    // WHERE ... AND ...
+if($debug===1){
+   // WHERE ... AND ...
     echo "severite avant:";
     print_r($severite);// OR si plusieurs a l'interieur
     echo "<br />urgence avant:";
     print_r($urgence);
+    echo "<br />statut avant:";
+    print_r($statut);
     // ORDER BY
     echo "<br />tri severite avant:";
     print($tri_severite);
     echo "<br />tri urgence avant:";
     print($tri_urgence);
-    echo "<br /><br />";
+    echo "<br />tri statut avant:";
+    print($tri_statut);
+    echo "<br />";
     // transmission : array(where,order_by);
-*/    
+}
     //---- preparation : WHERE
     // $where=array('severite'=>$severite,'urgence'=>$urgence,'statut'=>$statut);
     // si une valeur est vide, retirer OPTIMISATION
@@ -75,7 +80,6 @@ if ($debug===1){
 echo "<br />retravail WHERE:";
 print_r($where);
 }
-    
     //---- preparation : ORDERBY
    // $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
     $orderby=array();
@@ -91,156 +95,41 @@ print_r($where);
 if ($debug===1){
 echo '<br />retravail ORDERBY:';
 print_r($orderby);
-//@todo offrir la possibilité de trimballer les optionspour :remplir le formulaire de recherche (avec possibilité d'effacer)
+//@todo offrir la possibilité de trimballer les options pour : remplir le formulaire de recherche (avec possibilité d'effacer)
 }   
     
      /** seconde partie de la requete apres les champs, le filtre
       * 
       */
-     function requete_personnalisee_where($where){//@test les deux, le 1er, le dernier, et variatioon en multiple = 6 tests
-         //echo "<br />";
-         //print_r($where);
-         //--- WHERE
-         $return="";
-         $taille_1=sizeof($where);
-         $a=0;
-         //echo "taille ".$taille_1."<br />";
-         foreach($where as $key=>$value){// tous les éléments du tableau N1
-             $a++;
-             //$return.=" a est ".$a."/ ";
-             if($value!=''){// tant que tableau N2 n'est pas vide
-                  $return.= "(";
-                  //echo "tableau concernant ".$key."<br />"; 
-                  $taille_2=sizeof($value);// compteur commence à 2
-                  //echo 'taille du tableau '.$taille.'<br />';
-                  $i=0;
-                  foreach($value as $key_2=>$value_2){ //($i=0,$i<$taille,$i++){
-                      $i++;
-                      $return.= $key.'='.$key_2;
-                      if($i<$taille_2){
-                          $return.= " OR ";
-                      }
-                  }
-                  $return.= ")";//fin du tableau N2
-                    $suivant=next($where);// anticipation de l'élément suivant
-                        if($suivant!=''){//@bug fixé en nettoyant l'envoi, pas de tableau vide
-                        $return.= " AND ";// il faut qu'il y ait aussi eu un élément non vide avant
-                        }
-                        else{
-                            $return.="";
-                        }
-             }
-         }
-         return $return;
-     }
-     $result1=requete_personnalisee_where($where);
+     $result1=requete_personnalisee_where($where);// lib.php
 if($debug===1){
 echo "<br />Requete WHERE";
 print($result1);
 }
-     function requete_personnalisee_orderby($orderby){
-         $taille=sizeof($orderby);
-         $i=0;
-         $return ="";
-         foreach($orderby as $cle=>$valeur){
-             $i++;
-            if($i==1 AND $i==$taille){// si une seule valeur, la valeur est la première et la dernière
-               //$return.="(" ;
-               $return.=$cle." ".$valeur; 
-               //$return.=")";
-            }
-            elseif($i==1){// premier
-               //$return.="(" ;
-               $return.=$cle." ".$valeur;
-            }
-            elseif($i==$taille){// fin
-                $return.=",".$cle." ".$valeur;
-                //$return.=")";
-            }
-         }
-         return $return;
-     }
-     $result2=requete_personnalisee_orderby($orderby);
+     $result2=requete_personnalisee_orderby($orderby);// lib.php
         if($debug===1){
         echo "<br />Requete ORDERBY ";
         print($result2);
         echo "<br />";
         }
-     /*
-     pouvoir l'enregistrer, cad :
-     V-00 la récupérer en array (au premier jeu)
-     lui donner un nom sans accent ni apostrophe,virgule, espace
-     la mettre en fichier de config
-     la recherche est accessible par URL portant le nom
-     - le propriétaire ou niveau d'accès sera à voir plus tard !
+     /** @todo  pouvoir l'enregistrer, cad :
+     * V-00 la récupérer en array (au premier jeu)
+     * lui donner un nom sans accent ni apostrophe,virgule, espace
+     * la mettre en fichier de config
+     * la recherche est accessible par URL portant le nom
+     * le propriétaire ou niveau d'accès sera à voir plus tard !
      */
      //concatenation des 2 requetes
-     function requete_where_order($result1,$result2){
-            $return="";
-     if ($result1!="" AND $result2!=""){// optimal
-            $return.=" AND ";// WHERE avant
-            $return.="$result1";
-            $return.=" ORDER BY ";
-            $return.="$result2";           
-     }
-     elseif($result1!=""){
-            $return.=" AND ";// WHERE avant
-            $return.="$result1";
-     }
-     elseif($result2!=""){
-            $return.=" ORDER BY ";
-            $return.="$result2";
-     }      
-            return $return;
-     }
-     $result=requete_where_order($result1,$result2);
+     $result=requete_where_order($result1,$result2);// lib.php
         if($debug===1){//DEBUG non genant
         echo 'requete concatenee :';
         print($result);
         echo '<br />';
         }
-//echo "<br />Requete presque complete : ".$result;
      /** requete non preparee pour aller plus vite ?
       * @todo requete préparée
       */
-     function recherche_personnalisee($con,$where,$orderby){
-         try{
-           // 0/ connexion : con
-           // 1/ requete
-           //$query="SELECT * FROM incident ";// initialement
-$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
-$query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
-$query.=" FROM incident i";
-$query.=" JOIN statut s";
-$query.=" ON s.id_incident=i.id";
-$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
-//$query.=" AND i.id!=''";
-           $personnalisation=requete_where_order($where,$orderby);
-           $query.=$personnalisation;
-           // 4/ envoi
-           //$appel=$con->query($query);
-                $appel=$con->prepare($query);
-                    if($appel->execute()){
-                    $nombre=$appel->rowCount();//@bug FIXE pas pour SELECT, ou alors en PREPARE par execute
-                    //$return=$nombre;
-                    }else{
-                        die('KO');
-                    }
-                if($nombre>0){
-                    //$return='OK '.$nombre;
-                    $return=$appel->fetchall();
-                }
-                else{
-                    $return=$nombre.' : aucun enregistrement';
-                }
-           return $return;
-         }
-         catch (Exception $e){
-             echo "erreur au select";
-         }
-     }
-    
-    $requete=recherche_personnalisee($con,$result1,$result2);
+    $requete=$incident->recherche_personnalisee($con,$result1,$result2);// incident.php
 //echo "<br />requete finie: ";
 //print_r($requete);// tolere d'afficher du texte
         if($debug===1){//DEBUG non genant
@@ -256,15 +145,13 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
     }
 }
-else{
-   // echo "rien de prévu ?";
+else{// par défaut
 $result=$incident->retrieve_n_incident($con);
         if($debug===1){//DEBUG non genant
         echo '<pre>';
         print_r($result);
         echo '</pre>';
         }
-
     if(is_array($result)){
      $incident->display_admin_n_incident($result);
     }
@@ -272,5 +159,6 @@ $result=$incident->retrieve_n_incident($con);
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
     }
 }
+
     require_once '_bas.php';
 ?>

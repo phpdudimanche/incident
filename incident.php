@@ -8,12 +8,8 @@
      public $id;
      public $resume;// résumé vaut titre
      public $description;//tout commentaire utile...
-     
      public $severite;
-     public $urgence;
-     
-     private $severite_list=array(10=>'mineur',20=>'moyen',30=>'majeur',40=>'bloquant');//@todo mettre en _config.php
-     private $urgence_list=array(10=>'non urgent',20=>'urgent',30=>'immédiat');//@todo mettre en _config.php
+     public $urgence;// $statut est embarqué par param.php
 
 //----------------------- méthodes CRUD -------------------------------
       /** scripts CRUD
@@ -229,6 +225,42 @@ $query.=" AND i.id=:id";
               echo "Une erreur est survenue lors de la récupération";
             }
       }
+      function recherche_personnalisee($con,$where,$orderby){
+         try{
+           // 0/ connexion : con
+           // 1/ requete
+           //$query="SELECT * FROM incident ";// initialement
+$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
+$query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
+$query.=" FROM incident i";
+$query.=" JOIN statut s";
+$query.=" ON s.id_incident=i.id";
+$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
+//$query.=" AND i.id!=''";
+           $personnalisation=requete_where_order($where,$orderby);
+           $query.=$personnalisation;
+           // 4/ envoi
+           //$appel=$con->query($query);
+                $appel=$con->prepare($query);
+                    if($appel->execute()){
+                    $nombre=$appel->rowCount();//@bug FIXE pas pour SELECT, ou alors en PREPARE par execute
+                    //$return=$nombre;
+                    }else{
+                        die('KO');
+                    }
+                if($nombre>0){
+                    //$return='OK '.$nombre;
+                    $return=$appel->fetchall();
+                }
+                else{
+                    $return=$nombre.' : aucun enregistrement';
+                }
+           return $return;
+         }
+         catch (Exception $e){
+             echo "erreur au select";
+         }
+     }
 //----------------------- méthodes d'affichage --------------------------
  /** présentation du listing + header et footer
        * $type (admin avec liens modif / visiteur sans action)
@@ -267,7 +299,7 @@ $query.=" AND i.id=:id";
       * n'a pas l'option statut (n'existe pas encore)
       */
  function display_crea_incident(){
-      
+      global $severite_list,$urgence_list;
       $act="create";// à faire passer si formulaire mutualisé
   // si controle js des champs : onsubmit= fonction(); return false   
 	 $return="
@@ -277,11 +309,13 @@ $query.=" AND i.id=:id";
 			 $return.="<p><label class='vide'>&nbsp;</label>";
 			$name='severite';// v0 si nom du champ transmis / v1 réécriture du nom comme url
    $selected='';
-			$return.=$this->choisir_severite($name,$selected);
+   $array=$severite_list;
+			$return.=presente_select($array,$name,$selected);
 			  $return.=" ";
 			$name='urgence';
    $selected='';
-   $return.=$this->choisir_urgence($name,$selected);
+   $array=$urgence_list;
+   $return.=presente_select($array,$name,$selected);
      $return.="</p>";
 			
 			$return.="<p><label class='vide' for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description' onfocus='javascript:this.value = \"\"' onsubmit='javascript:this.value = \"\"'>ce qui ne serait pas rapporté d'un autre outil</textarea></p>
@@ -296,7 +330,7 @@ $query.=" AND i.id=:id";
   */
  function display_modif_incident($id,$resume,$statut,$severite,$urgence,$description){
      //----- dépendances -----------
-     global $statut_list;
+     global $statut_list,$severite_list,$urgence_list;
      
     $act="update";// à faire passer si formulaire mutualisé
     // difference : value remplie sans js
@@ -308,11 +342,13 @@ $query.=" AND i.id=:id";
 	$return.="<p><label class='vide'>&nbsp;</label>";
 			$name='severite';// v0 si nom du champ transmis / v1 réécriture du nom comme url
             $selected=$severite;// recup
-	$return.=$this->choisir_severite($name,$selected);
+            $array=$severite_list;
+	$return.=presente_select($array,$name,$selected);
 	$return.=" ";
 			$name='urgence';
             $selected=$urgence;// recup
-   $return.=$this->choisir_urgence($name,$selected);
+            $array=$urgence_list;
+   $return.=presente_select($array,$name,$selected);//$this->choisir_urgence($name,$selected);
    $return.=" ";
        $name='statut';
        $selected=$statut;//@todo implémenter la table de donnée
@@ -337,68 +373,6 @@ $query.=" AND i.id=:id";
         <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label." - ".$statut_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
         </dl><br />");}
- /** en formulaire de création et modification
-  * @todo mettre en fonctions utile
-  */
- function presente_select($array,$name,$selected){
-   	$return= '<select name="'.$name.'" size="1">';
-   		$return.= '<option value="">--- '.$name.'</option>';// null first
-   	foreach($array as $key=>$value){
-   			$return.= '<option value="'.$key.'"';//key avant
-   		if ($selected==$key) {//key comparee au resultat de requete : ATTENTION
-   				$return.='selected="selected"';
-   		}
-   			$return.= '>';
-   	 	$return.= $value;
-   			$return.= '</option>';
-   	}
-   		$return.= '</select>';
-   	return $return;
-   //	print_r($array);
- }
- function choisir_severite($name,$selected){
-  $array=$this->severite_list;
-  $return=$this->presente_select($array,$name,$selected);
-  return $return;
- }
- /** en formulaire de recherche avancee
-  * @todo mettre en fonctions utile
-  */
- function choisir_avancee($type,$name){
-  $la_liste=$type.'_list';// impossible à utiliser de suite : provoque erreur
-  $array=$this->$la_liste;
-  
-  $return='
-  <p class="severite"><label class="utile">
-  '.$name.' : ';
-  //$return.='<a href="#fermer" class="mini">fermer</a>';// haut
- // $return.='</label><label class="utile">';
-  $return.='<input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="asc" title="asc">
-  <input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="desc" title="desc" ></label>';// problème des labels for
-      foreach($array as $key => $value){
-      $return.='<label><input type="checkbox" name="'.$type.'['.$key.']" />'.$value.'</label><br />';
-      }
-  $return.='</p>'; // bas
-  return $return;
- }
- function choisir_urgence($name,$selected){
-  $array=$this->urgence_list;
-  $return=$this->presente_select($array,$name,$selected);
-  return $return;
- }
- /** utilisé en page de visualisation
-  *
-  */
- function  annoncer_severite($key){
-     $array=$this->severite_list;
-     $return=(array_key_exists($key,$array))?$array[$key]:'';// sans cela, avec clé inexistante : message Undefined offset: 0
-     return $return;
- }
- function  annoncer_urgence($key){
-     $array=$this->urgence_list;
-     $return=(array_key_exists($key,$array))?$array[$key]:'';
-     return $return;
- }
 
  }
 ?>

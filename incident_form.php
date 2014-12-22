@@ -1,6 +1,6 @@
 <?php
-ini_set('display_errors', 1); 
-error_reporting(E_ALL); 
+//ini_set('display_errors', 1); 
+//error_reporting(E_ALL); 
 
 isset($_REQUEST['act'])?$act=$_REQUEST['act']:$act='';
 isset($_REQUEST['id'])?$id=$_REQUEST['id']:$id='';
@@ -18,7 +18,7 @@ print("
 
 if($act=="create"){
 $form_creation=$incident->display_crea_incident();
-echo $form_creation;
+print ($form_creation);
 }
 elseif($act=="update"){
  // query select fetch  
@@ -37,8 +37,9 @@ $description=$result[0]['description'];
 $form_modification=$incident->display_modif_incident($id,$resume,$statut,$severite,$urgence,$description);
 echo $form_modification;
 }
-else{
-    echo "que faire ?";//@todo par défaut proposer la création ?
+else{//@todo par défaut proposer la création ?
+    $form_creation=$incident->display_crea_incident();
+    print($form_creation);
 }
 
 require_once '_bas.php';

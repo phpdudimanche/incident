@@ -32,9 +32,9 @@ require_once 'incident.php';
 $incident=new incident;
 
 echo '<form id="listing" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
-$severite_avancee=$incident->choisir_avancee('severite','sévérité');// chacune des colonnes
+$severite_avancee=choisir_avancee('severite','sévérité');// chacune des colonnes
 print($severite_avancee);
-$urgence_avancee=$incident->choisir_avancee('urgence','urgence');
+$urgence_avancee=choisir_avancee('urgence','urgence');
 print($urgence_avancee);
 $statut_avancee=choisir_avancee('statut','statut');
 print($statut_avancee);

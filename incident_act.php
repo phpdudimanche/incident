@@ -2,8 +2,8 @@
 /** aiguillage CRUD
  * 
  */
-ini_set('display_errors', 1); 
-error_reporting(E_ALL); 
+//ini_set('display_errors', 1); 
+//error_reporting(E_ALL); 
 
 $title='actions de CRUD sur incident';
 
@@ -23,21 +23,19 @@ $statut=((isset($_POST['statut']))AND($_POST['statut']!=''))?$_POST['statut']:''
 /** @todo n'eut pas été nécessaire avec un contrôleur : pour la redirection, pas de sortie écran avant : 
  * 
  */
-if(($act=='create')||($act=='delete_confirm')||($act=='update')||($act=='search_id')){// marche dans ce sens, pas dans l'autre !==
+if($debug===1){
+require_once '_haut.php';// permet de bien encoder, même si bloque l'action
+echo "<h1>$title</h1>"; 
+echo '<p>résumé:'.$resume.'|act:'.$act.'|description:'.$description.'|sévérité:'.$severite.'|urgence:'.$urgence.'</p>';  
+exit();
+}
+elseif(($act=='create')||($act=='delete_confirm')||($act=='update')||($act=='search_id')){// marche dans ce sens, pas dans l'autre !==
 }
 else{
-    //echo 'act:'.$act;
 require_once '_haut.php';// empeche deja le redirect ?
 echo "<h1>$title</h1>";// empeche le redirect tout le temps
 }
-
-
-if($debug==1){// empeche le redirect en mode debug
-echo '<p>résumé:'.$resume.'|act:'.$act.'|description:'.$description.'|sévérité:'.$severite.'|urgence:'.$urgence.'</p>';    
-}
-///exit();
-//echo $erreur;
-
+//@todo affichage des erreurs
 
 //--------------------------------- contrôleur -----------------------
 if ($act=='create'){
@@ -55,11 +53,8 @@ elseif($act=='delete_confirm'){
      header('location:incident_list.php');
 }
 elseif($act=='update'){
-  //script mise à jour
   $incident->update_incident($con,$id,$resume,$description,$statut,$severite,$urgence);
-  // détecter si retourne un message (return) ou rien (void) pour voir s'il y a lieu de faire une redirection
-  header('location:incident_list.php');// fera de toute façon une erreur !
-  
+  header('location:incident_list.php');
 }
 elseif($act=='read'){
     // Récupération des données : page _list
@@ -69,12 +64,8 @@ elseif($act=='search_id'){
     header('location:incident_list.php?act=view&id='.$id.'');
 }
 else{
-    echo "rien demandé";
+    echo "Vous n'avez rien demandé ? Vous pouvez <a href='index.php'>retourner à l'accueil</a>.";
 }
-
-
-
-
 
 require_once '_bas.php';
 ?>
