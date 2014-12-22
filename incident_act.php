@@ -52,7 +52,7 @@ elseif($act=='delete'){
 elseif($act=='delete_confirm'){
      echo "<p>Supprimer id : ".$id."</p>";
      $incident->delete_incident($con,$id);
-     //header('location:incident_list.php');
+     header('location:incident_list.php');
 }
 elseif($act=='update'){
   //script mise à jour
