@@ -5,8 +5,10 @@ isset($_REQUEST['act'])?$act=$_REQUEST['act']:$act='';
 isset($_REQUEST['id'])?$id=$_REQUEST['id']:$id='';
 isset($_REQUEST['severite'])?$severite=$_REQUEST['severite']:$severite='';
 isset($_REQUEST['urgence'])?$urgence=$_REQUEST['urgence']:$urgence='';
+isset($_REQUEST['statut'])?$statut=$_REQUEST['statut']:$statut='';
 isset($_REQUEST['tri_severite'])?$tri_severite=$_REQUEST['tri_severite']:$tri_severite='';
 isset($_REQUEST['tri_urgence'])?$tri_urgence=$_REQUEST['tri_urgence']:$tri_urgence='';
+isset($_REQUEST['tri_statut'])?$tri_statut=$_REQUEST['tri_statut']:$tri_statut='';
 
 $title='Affichage d\'incident';
 
@@ -63,6 +65,9 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     if($urgence!=''){
         $where['urgence']=$urgence;
     }
+    if($statut!=''){
+        $where['statut']=$statut;
+    }
 //echo "<br />retravail WHERE:";
 //print_r($where);
     
@@ -74,6 +79,9 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
     }
     if($tri_urgence!=''){
         $orderby['urgence']=$tri_urgence;
+    }
+    if($tri_statut!=''){
+        $orderby['statut']=$tri_statut;
     }
 //echo '<br />retravail ORDERBY:',
 //print_r($orderby);
@@ -148,6 +156,7 @@ elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout
      $result2=requete_personnalisee_orderby($orderby);
 //echo "<br />Requete ORDERBY";
 //print($result2);
+//exit();
 //echo "<br />";
      /*
      pouvoir l'enregistrer, cad :

@@ -25,6 +25,7 @@
         // 0/ appel de la connexion
         // 1/ requête
         $query = "INSERT INTO incident SET resume= ?, description = ?, severite = ?, urgence = ?";
+        //@todo mettre le statut à nouveau 10 
         // 2/ étape préparation
         $stmt = $con->prepare($query);
         // 3/ binder, passer les paramètres
@@ -229,7 +230,7 @@
     echo "</table>";
       }
  /** formulaire de création // vocation à être différent d'un formulaire de modification ?!
-      * 
+      * n'a pas l'option statut (n'existe pas encore)
       */
  function display_crea_incident(){
       
@@ -260,6 +261,9 @@
   * 
   */
  function display_modif_incident($id,$resume,$severite,$urgence,$description){
+     //----- dépendances -----------
+     global $statut_list;
+     
     $act="update";// à faire passer si formulaire mutualisé
     // difference : value remplie sans js
   // si controle js des champs : onsubmit= fonction(); return false   
@@ -267,14 +271,19 @@
 	 		<form name='instance_incident' id='instance_incident' action='incident_act.php' method='post'><input type='hidden' name='act' id='act' value='$act'><input type='hidden' name='id' id='id' value='$id'>
 			<p><label class='vide' for='resume'>Résumé : </label><input type='text' name='resume' id='resume' size='70' value='".$resume."'></p>";
 			
-			 $return.="<p><label class='vide'>&nbsp;</label>";
+	$return.="<p><label class='vide'>&nbsp;</label>";
 			$name='severite';// v0 si nom du champ transmis / v1 réécriture du nom comme url
-   $selected=$severite;// recup
-			$return.=$this->choisir_severite($name,$selected);
-			  $return.=" ";
+            $selected=$severite;// recup
+	$return.=$this->choisir_severite($name,$selected);
+	$return.=" ";
 			$name='urgence';
-   $selected=$urgence;// recup
+            $selected=$urgence;// recup
    $return.=$this->choisir_urgence($name,$selected);
+   $return.=" ";
+       $name='statut';
+       $selected='';//@todo implémenter la table de donnée
+       $array=$statut_list;//param.php
+   $return.=presente_select($array,$name,$selected);
      $return.="</p>";
 			
 			$return.="<p><label class='vide' for='description'>Description : </label><textarea rows='6' cols='71' name='description' id='description'>".$description."</textarea></p>
@@ -291,7 +300,7 @@
         <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
         </dl><br />");}
- /** 
+ /** en formulaire de création et modification
   * @todo mettre en fonctions utile
   */
  function presente_select($array,$name,$selected){
@@ -315,7 +324,7 @@
   $return=$this->presente_select($array,$name,$selected);
   return $return;
  }
- /** 
+ /** en formulaire de recherche avancee
   * @todo mettre en fonctions utile
   */
  function choisir_avancee($type,$name){
@@ -340,6 +349,9 @@
   $return=$this->presente_select($array,$name,$selected);
   return $return;
  }
+ /** utilisé en page de visualisation
+  *
+  */
  function  annoncer_severite($key){
      $array=$this->severite_list;
      $return=(array_key_exists($key,$array))?$array[$key]:'';// sans cela, avec clé inexistante : message Undefined offset: 0
