@@ -28,6 +28,9 @@ tr:hover{background-color:#C0C0C0;}
 .mini{font-weight:normal;}
 hr{clear:both;visibility:hidden;}
 h1{clear:both}/* permet de ne pas décaler le titre lors de la recherche_avancee */
+.page{background-color:#C0C0C0;width:1.5em;}
+.encours{background-color:white;width:1.5em;vertical-align:central;}
+form{display:inline}/* evite le saut de ligne*/
 /*input[type="radio"]{display:none;}
 input[type="radio"] + label{cursor: pointer;background-image:url(icon_down_sort_arrow.png) left center no-repeat;content:"asc"}
 */

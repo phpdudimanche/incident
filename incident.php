@@ -3,6 +3,7 @@
  *  ne pas transformer cela en tchat ou échange de mail : capitaliser infos dans des champs dédiés
  */
  require_once 'config.php';
+ require_once 'lib.php';
  class incident{
      
      public $id;
@@ -135,7 +136,27 @@ $con->commit();
         echo "Erreur: " . $exception->getMessage();
     }   
       }
-      function retrieve_n_incident($con){//@todo remanier cette requete par défaut
+      /** total pour requete suivante : PAGINATION (sans filtre)
+       * 
+       */
+      function count_n_incident($connexion){
+          $query="SELECT COUNT(*) FROM incident";
+            $flux= $connexion->prepare($query);
+            $flux->setFetchMode(PDO::FETCH_ASSOC);	
+                    if($flux->execute()){
+            			$total=$flux->fetchColumn();
+            			$return= $total;//.' resultats ';
+            			//	$nbre_pages=ceil($total/$lignes_par_page);// voir fonction qui sort le nombre de pages
+            			//	echo $nbre_pages.' pages :';
+            			return($return);
+                    }else{
+                        die('KO execution');
+                    }
+      }
+      function retrieve_n_incident($con,$page_demandee){
+                        //nouveau : $page_demandee, LIMIT
+                        global $lignes_par_page;
+                        $depart=($page_demandee*$lignes_par_page)-$lignes_par_page;
       try{
   
         // 0/ connexion
@@ -149,26 +170,25 @@ $query.=" ON s.id_incident=i.id";
 $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
 $query.=" AND i.id!=''";
 $query.=" ORDER BY statut ASC, severite DESC, urgence DESC";
+                        $query.=" LIMIT :offset,:length";// pagination
         //$query.=" ORDER BY severite DESC, urgence DESC";// initialement
-    //@todo recuperer le dernier statut (tous,celamultiplierait les lignes)
         // 2/ étape préparation
         $stmt =$con->prepare($query);
         // precision : passer en objet ? nom de colonne ! = FETCH_ASSOC (par défaut sinon =both : nom+ordre)
         $stmt->setFetchMode(PDO::FETCH_ASSOC);// FETCH_OBJ FETCH_CLASS,'incident' sort tous les param de la classe, et pas mieux !
         // 3/ binder, passer les paramètres
+                       $stmt->bindParam(':offset', $depart,PDO::PARAM_INT);// INDISPENSABLE forcer le type pour lim
+                       $stmt->bindParam(':length', $lignes_par_page,PDO::PARAM_INT);// INDISPENSABLE forcer le type pour limit
         // 4/ exécution, envoi de la requete
         if($stmt->execute()){
         $nombre=$stmt->rowCount();
             //echo "OK ".$nombre." enregistrement trouvé";
         }else{
-            die('KO');// fait un return ?
+            die('KO');
         }  
          if($nombre>0)
          {  
              $result = $stmt->fetchAll();
-            /*echo '<pre>';
-            print_r($result);
-            echo '</pre>';*/
             return $result;
          }
          else{
@@ -225,7 +245,34 @@ $query.=" AND i.id=:id";
               echo "Une erreur est survenue lors de la récupération";
             }
       }
-      function recherche_personnalisee($con,$where,$orderby){
+      function count_n_incident_avancee($connexion,$where,$orderby,$requete){
+          //$query="SELECT COUNT(*) FROM incident";
+         $query="SELECT COUNT(i.id), i.resume, i.description, i.severite, i.urgence";
+        $query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
+        $query.=" FROM incident i";
+        $query.=" JOIN statut s";
+        $query.=" ON s.id_incident=i.id";
+        $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
+                    //$query.=" WHERE id!='' ";
+                    //$personnalisation=requete_where_order($where,$orderby);
+                    ($requete!='')?$personnalisation=$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
+                    $query.=$personnalisation;
+            $flux= $connexion->prepare($query);
+            $flux->setFetchMode(PDO::FETCH_ASSOC);	
+                    if($flux->execute()){
+            			$total=$flux->fetchColumn();
+            			$return= $total;//.' resultats ';
+            			//	$nbre_pages=ceil($total/$lignes_par_page);// voir fonction qui sort le nombre de pages
+            			//	echo $nbre_pages.' pages :';
+            			return($return);
+                    }else{
+                        die('KO execution comptage avancee');
+                    }
+      }
+      function recherche_personnalisee($con,$where,$orderby,$page_demandee,$requete){
+                        //LIMIT : $page_demandee
+                        global $lignes_par_page;
+                        $depart=($page_demandee*$lignes_par_page)-$lignes_par_page;
          try{
            // 0/ connexion : con
            // 1/ requete
@@ -237,11 +284,15 @@ $query.=" JOIN statut s";
 $query.=" ON s.id_incident=i.id";
 $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
 //$query.=" AND i.id!=''";
-           $personnalisation=requete_where_order($where,$orderby);
+           //$personnalisation=requete_where_order($where,$orderby);
+           ($requete!='')?$personnalisation=$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
            $query.=$personnalisation;
+                        $query.=" LIMIT :offset,:length";// pagination
            // 4/ envoi
            //$appel=$con->query($query);
                 $appel=$con->prepare($query);
+                        $appel->bindParam(':offset', $depart,PDO::PARAM_INT);// INDISPENSABLE type pour limit
+                        $appel->bindParam(':length', $lignes_par_page,PDO::PARAM_INT);// INDISPENSABLE type pour limit
                     if($appel->execute()){
                     $nombre=$appel->rowCount();//@bug FIXE pas pour SELECT, ou alors en PREPARE par execute
                     //$return=$nombre;
@@ -265,12 +316,12 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
  /** présentation du listing + header et footer
        * $type (admin avec liens modif / visiteur sans action)
        */
- function display_admin_n_incident($array){
+ function display_admin_n_incident($array){         // modif parce que sans arrayni pagination
      global $statut_list,$severite_list,$urgence_list;// param.php
-          $nombre=sizeof($array);
-          $label=($nombre>1)?"incidents":"incident";// gérer le pluriel
-          echo "<div id=''><p>".$nombre." ".$label." | ";// mise en page
-          echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
+          $nombre=sizeof($array);// si array complet sans PAGINATION
+                                                    //$label=($nombre>1)?"incidents":"incident";// gérer le pluriel
+                                                     //echo "<div id=''><p>".$nombre." ".$label." | ";// mise en page 
+                                                      //echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
     echo "<table>";
           for($i=0;$i<$nombre;$i++){
           $label_severite=afficher_statut($array[$i]['severite'],$severite_list);//$this->annoncer_severite($array[$i]['severite']);

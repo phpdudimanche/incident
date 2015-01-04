@@ -9,6 +9,8 @@ isset($_REQUEST['statut'])?$statut=$_REQUEST['statut']:$statut='';
 isset($_REQUEST['tri_severite'])?$tri_severite=$_REQUEST['tri_severite']:$tri_severite='';
 isset($_REQUEST['tri_urgence'])?$tri_urgence=$_REQUEST['tri_urgence']:$tri_urgence='';
 isset($_REQUEST['tri_statut'])?$tri_statut=$_REQUEST['tri_statut']:$tri_statut='';
+isset($_REQUEST['page'])?$page=$_REQUEST['page']:$page='';
+isset($_POST['requete'])?$requete=unserialize($_POST['requete']):$requete='';
 
 $title='Affichage d\'incident';
 
@@ -120,16 +122,27 @@ print($result1);
      * le propriétaire ou niveau d'accès sera à voir plus tard !
      */
      //concatenation des 2 requetes
-     $result=requete_where_order($result1,$result2);// lib.php
+     //$result=requete_where_order($result1,$result2);//@TODO controler securite, surtout en pagination lib.php 
+     ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// requete depuis pagination
         if($debug===1){//DEBUG non genant
         echo 'requete concatenee :';
-        print($result);
+        print($result);// PAGINATION-avancee a passer en formulaire
         echo '<br />';
         }
      /** requete non preparee pour aller plus vite ?
       * @todo requete préparée
       */
-    $requete=$incident->recherche_personnalisee($con,$result1,$result2);// incident.php
+      
+        $display_array=$incident->count_n_incident_avancee($con,$result1,$result2,$requete);//@todo requete si pagination, compte total
+        $data=infos_pagination($display_array, $page);// OK compatible array-sgbd
+        if($debug===1){
+        print_r($display_array);
+        print_r($data);
+        }
+        $nbre_pages=$data['nombre de pages'];
+        $page_demandee=$data['page demandee'];
+      
+    $requete=$incident->recherche_personnalisee($con,$result1,$result2,$page_demandee,$requete);//@todo requete incident.php
 //echo "<br />requete finie: ";
 //print_r($requete);// tolere d'afficher du texte
         if($debug===1){//DEBUG non genant
@@ -139,21 +152,52 @@ print($result1);
         }
 
     if(is_array($requete)){// pour éviter de traiter du vide !
+    
+    
+    //<input type="hidden" name="act" value="recherche_avancee">// PAGINATION-avancee a passer en formulaire
+    $pages=menu_pagination($nbre_pages,$page_demandee);// OK compatible array-sgbd
+        if($debug===1){
+        echo "<br />pagination : ";
+        print_r($pages);
+        }
+          $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
+          echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
+          echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
+          display_pagination($pages,$display_array,'recherche_avancee',$result);
     $incident->display_admin_n_incident($requete);
+          display_pagination($pages,$display_array,'recherche_avancee',$result);
     }
     else{
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
     }
 }
 else{// par défaut
-$result=$incident->retrieve_n_incident($con);
+$display_array=$incident->count_n_incident($con);// si pagination, compte total
+        $data=infos_pagination($display_array, $page);// OK compatible array-sgbd
+        if($debug===1){
+        print_r($display_array);
+        print_r($data);
+        }
+        $nbre_pages=$data['nombre de pages'];
+        $page_demandee=$data['page demandee'];
+$result=$incident->retrieve_n_incident($con,$page_demandee);// retrieve_all_incident($con)
         if($debug===1){//DEBUG non genant
         echo '<pre>';
         print_r($result);
         echo '</pre>';
         }
-    if(is_array($result)){
+    if(is_array($result)){// si au moins un resultat
+$pages=menu_pagination($nbre_pages,$page_demandee);// OK compatible array-sgbd
+if($debug===1){
+echo "<br />pagination : ";
+print_r($pages);
+}
+          $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
+          echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
+          echo "<a href='incident_form.php?act=create'>en consigner un autre</a></p>";
+display_pagination($pages,$display_array,'','');
      $incident->display_admin_n_incident($result);
+display_pagination($pages,$display_array,'','');
     }
     else{
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed

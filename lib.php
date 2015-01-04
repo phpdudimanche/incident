@@ -138,5 +138,93 @@
      }      
             return $return;
      }
-
+    /** filtrer un résultat et préparer la pagination
+     *  @param[in] tableau à traiter, page demandée, 
+     *  @global lignes par page
+     *  @param[out] taille du tableau, nombre de pages, page demandée, tableau filtré
+     *  @return array
+     */
+    function infos_pagination($display_array, $page) {
+            global $lignes_par_page;
+    $return=array();
+    			//echo "par page :".$lignes_par_page."<br />";
+    							if(is_array($display_array)){
+    		$total = sizeof($display_array);// nombre de valeurs en comptant le 0
+    							}
+    							else{
+    							$total=$display_array;
+    							}
+    $return['nombre de resultats']=$total;//echo "total : ".$total."<br />";
+    		$nbre_pages=ceil($total/$lignes_par_page);// nombre de pages arrondi au supérieur POSITIF 1,1=2 MAIS -3,2=-3 
+    $return['nombre de pages']=$nbre_pages;//echo "nombre de pages : ".$nbre_pages."<br />";		
+            $page = ($page < 1) ? 1 : $page;// si erreur avec 0 de mis, sinon demarrage à- lignes_par_page
+    $return['page demandee']=$page;//echo "page ".$page."<br />";
+            $debut = ($page - 1) * ($lignes_par_page);// $show_per_page + 1 (3-1=2)*(3)
+    			//echo "indice de demarrage dans tableau original : ".$start."<br />";
+            $taille = $lignes_par_page;// car compte déjà avec +1
+    if(is_array($display_array)){// ATTENTION
+    $return['resultats'] = array_slice($display_array,$debut,$taille); // si pagination sur ARRAY et non SGBD
+    }
+    			return($return);
+        }
+    /** éléments de la pagination
+     *  @param[in] nombre de pages, page demandée
+     *  @param[out] tableau du numéro des pages et de 'la page en cours'
+     *  @test : nominal page 5/3; inférieur page 3/1; supérieur 2/2 ;erreur  2/3
+     */
+    function menu_pagination($nbre_pages,$page_demandee){
+        		global $max_liens_pages;		
+        				$return=array();//$return='';// présenter dans l'ordre de sortie, du - vers +
+        	if($page_demandee<=$nbre_pages){// KO $nbre_pages>$page_demandee
+        		$mini=(($page_demandee-$max_liens_pages)<=0)?1:($page_demandee-$max_liens_pages);
+        			if($mini!=1){
+        				$return[1]=1;//$return.='1|';//debut
+        			}		
+        		for($i=$mini;$i<$page_demandee;$i++){// // N incréments avant
+        		// gérer les impossibilités
+        				$return[$i]=$i;//$return.=$i.'|';// capable de faire -1,0
+        		}
+        				if($nbre_pages>1){// evite de mettre une pagination pour rien
+        				$return[$page_demandee]="'".$page_demandee."'";//$return.='<b>'.$page_demandee.'</b>|';
+        				}
+        		$maxi=(($page_demandee+$max_liens_pages)>=$nbre_pages)?	$nbre_pages:($page_demandee+$max_liens_pages);				
+        		for($i=$page_demandee+1;$i<=$maxi;$i++){// // N incréments après $i<=$page_demandee+$max_liens_pages
+        		// gérer les impossibilités
+        				$return[$i]=$i;//$return.=$i.'|';
+        		}	
+        			if($maxi<$nbre_pages){
+        				$return[$nbre_pages]=$nbre_pages;//$return.=$nbre_pages;//debut
+        			}
+        				
+        	}
+        	else{
+        			    //$return.="ATENTION, la page demandee ne peut etre superieure au nombre de pages total.";
+        	}	
+        				return $return;	
+        }
+    /** affichage du lien de pagination
+     *  @param[in] la liste des numéros de page, le tableau complet à véhiculer par champ caché
+     *  @return display
+     */
+    function display_pagination($pages,$display_array,$action,$requete){
+        // $pages:menu_pagination $display_array:donnees completes si requete sans limit, recherche_avancee si action
+        print("<form id='pagination' name='pagination' action='".$_SERVER['PHP_SELF']."' method='post'>
+        <input type='hidden' name='donnees' id='donnees' value='".serialize($display_array)."'>
+        <input type='hidden' name='requete' id='requete' value='".serialize($requete)."'>
+        <input type='hidden' name='act' value='".$action."'>
+        ");// passer array en serialize
+        foreach($pages as $key=>$value){
+        	if(strstr($value,"'")){// page en cours avec '...'
+        	//echo "valeur:".$value;
+        	$value=strtr($value, "'", " ");// 
+        	printf("<input class='page encours' type='text' value='%d' readonly='true'></input>",$value);// 'value' sort 0 (si pas nettoye)
+        	}
+        	else{
+        	printf("<input name='page' id='page' class='page' type='submit' value='%d' readonly='true' />",$value);// mettre un submit sur des pages
+        	//@todo : faire des fonds d'image
+        	}
+        }
+        print("</form>
+        ");
+    }
 ?>
