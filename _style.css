@@ -33,7 +33,7 @@ h1{clear:both}/* permet de ne pas décaler le titre lors de la recherche_avancee
 .page{background-color:#C0C0C0;width:1.5em;}
 .encours{background-color:white;width:1.5em;vertical-align:central;}
 form{display:inline}/* evite le saut de ligne*/
-.important{display:block;width:450px;float:left;}
+.important{display:block;width:300px;float:left;}
 input[type="radio"].important{display:inline;}
 label.important{display:block;float:left;width:290px;color:black;}
 /*input[type="radio"]{display:none;}
