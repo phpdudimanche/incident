@@ -61,6 +61,9 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     }
 }
 elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout est intégré
+/*echo "Action : ".$act."<br/>";
+echo "Requete depuis pagination : ".$requete;
+exit();*/
     if($debug===1){
    // WHERE ... AND ...
     echo "severite avant:";

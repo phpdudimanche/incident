@@ -6,6 +6,7 @@ dt,label{display:block;float:left;width:7em;text-align:right;margin-right:1em;}
 dd{display:inline-block;width:40em;text-align:left;margin-right:1em;}/* mais descend si ecran etroit */
 input[type="submit"]{color:red}
 #listing{display:none;text-align:right;}
+#sauvees{display:none;text-align:right;}
 label{display:block;float:left;width:150px;color:black;}
 input[type="checkbox"]{float:right;}
 input[type="radio"]{vertical-align:middle;margin-bottom:0.3em;}
@@ -17,6 +18,7 @@ label.utile{font-weight:bold;}
 .urgence{display:block;width:150px;float:left;}
 .action{display:block;width:90px;float:left;}
 #listing:target{display:block;}/* z-index:100 */
+#sauvees:target{display:block;}
 /* tableau de display admin */
 table, td{border:2px;padding:0px 2px 0px 2px;}/* top right bottomleft */
 tr:hover{background-color:#C0C0C0;}
@@ -31,6 +33,9 @@ h1{clear:both}/* permet de ne pas décaler le titre lors de la recherche_avancee
 .page{background-color:#C0C0C0;width:1.5em;}
 .encours{background-color:white;width:1.5em;vertical-align:central;}
 form{display:inline}/* evite le saut de ligne*/
+.important{display:block;width:450px;float:left;}
+input[type="radio"].important{display:inline;}
+label.important{display:block;float:left;width:290px;color:black;}
 /*input[type="radio"]{display:none;}
 input[type="radio"] + label{cursor: pointer;background-image:url(icon_down_sort_arrow.png) left center no-repeat;content:"asc"}
 */

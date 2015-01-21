@@ -26,7 +26,8 @@ $return="<form name='rechercher_id_incident' id='rechercher_id_incident' action=
 echo $return;
 $links="
 <a href='#listing' class='plus'>Recherche avancée</a>
- | <a href='incident_list.php'>Liste des incidents (par défaut)</a>
+ | <a href='incident_list.php'>Liste des incidents</a> 
+ | <a href='#sauvees' class='plus'>Recherches personnalisées</a>
 </form>
 ";// fonction de lien libelles
 echo $links;
@@ -44,6 +45,17 @@ $statut_avancee=choisir_avancee('statut','statut');
 print($statut_avancee);
 echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
 
+echo '<form id="sauvees" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
+//echo 'liste des requetes';
+$taille=sizeof($recherche_personnalisee);
+//echo $taille;
+echo '<p class="important">';
+for($i=0; $i<$taille; $i++){
+   echo '<label for="'.$i.'" class="important">'.$recherche_personnalisee[$i]['titre'].'';
+   echo "<input type='radio' name='requete' id='".$i."' value='".serialize($recherche_personnalisee[$i]['recherche'])."'></label>";//serialize impose " et non '
+}
+echo '</p>';
+echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
 ?>
 
 
