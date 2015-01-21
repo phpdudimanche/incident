@@ -12,6 +12,7 @@ require_once 'param.php';// paramètres de configuration fine : règles métiers
 //--- connexion
     try {
         $con = new PDO("mysql:host={$host};dbname={$db_name};port={$port};",$username, $password);
+
         //echo "OK";
     }
     // to handle connection error

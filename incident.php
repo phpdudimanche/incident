@@ -312,6 +312,55 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
              echo "erreur au select";
          }
      }
+/** pour l'export : pas de limit
+ * 
+ */
+function recherche_personnalisee_tout($con,$requete){
+                        //LIMIT : $page_demandee
+                        //global $lignes_par_page;
+                        //$depart=($page_demandee*$lignes_par_page)-$lignes_par_page;
+         try{
+           // 0/ connexion : con
+           // 1/ requete
+           //$query="SELECT * FROM incident ";// initialement
+$query="SELECT i.id, i.resume, i.description, i.severite, i.urgence";
+$query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
+$query.=" FROM incident i";
+$query.=" JOIN statut s";
+$query.=" ON s.id_incident=i.id";
+$query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
+//$query.=" AND i.id!=''";
+           //$personnalisation=requete_where_order($where,$orderby);
+           ($requete!='')?$personnalisation=' AND '.$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
+           $query.=$personnalisation;
+                        //$query.=" LIMIT :offset,:length";// pagination
+    //return($query);
+    //exit();
+           // 4/ envoi
+           //$appel=$con->query($query);
+                $appel=$con->prepare($query);
+                $appel->setFetchMode(PDO::FETCH_ASSOC);// PDO::FETCH_FUNC, "fruit"
+                        //$appel->bindParam(':offset', $depart,PDO::PARAM_INT);// INDISPENSABLE type pour limit
+                       // $appel->bindParam(':length', $lignes_par_page,PDO::PARAM_INT);// INDISPENSABLE type pour limit
+                    if($appel->execute()){
+                    $nombre=$appel->rowCount();//@bug FIXE pas pour SELECT, ou alors en PREPARE par execute
+                    //$return=$nombre;
+                    }else{
+                        die('KO');
+                    }
+                if($nombre>0){
+                    //$return='OK '.$nombre;
+                    $return=$appel->fetchall();
+                }
+                else{
+                    $return=$nombre.' : aucun enregistrement';
+                }
+           return $return;
+         }
+         catch (Exception $e){
+             echo "erreur au select";
+         }
+     }
 //----------------------- méthodes d'affichage --------------------------
  /** présentation du listing + header et footer
        * $type (admin avec liens modif / visiteur sans action)

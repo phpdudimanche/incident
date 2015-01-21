@@ -1,3 +1,6 @@
+<?php
+//@todo mutualiser traitement des entrants ?
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,7 +17,7 @@ print("
     </head>
 <body>
 <?php
-// @todo de l'intérêt d'avoir un controleur, un seul si affichage modif _form ou visu _list
+// @todo de l'intérêt d'avoir un controleur, un seul si affichage modif _form ou visu _list : acces visu ou modif ?
 $return="<form name='rechercher_id_incident' id='rechercher_id_incident' action='incident_act.php' method='post'>
          <input type='hidden' name='act' id='act'value='search_id'>
          <input type='text' size='3' value='id' id='id' name='id' onFocus='javascript:this.value=\"\"'>
@@ -31,6 +34,7 @@ echo $links;
 require_once 'incident.php';
 $incident=new incident;
 
+//@todo : droits URL+ visiteurs=-visu, acteurs=-modif, admin==-admin
 echo '<form id="listing" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
 $severite_avancee=choisir_avancee('severite','sévérité');// chacune des colonnes
 print($severite_avancee);
