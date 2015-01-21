@@ -483,6 +483,8 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
         <p><dt>Résumé :</dt><dd>".$result[0]['resume']."</dd></p>
         <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label." - ".$statut_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
+        <p><dt>Actions :</dt><dd><a href='incident_form.php?act=update&id=".$result[0]['id']."'>modifier</a>
+         | <a href='incident_act.php?act=delete&id=".$result[0]."'>supprimer</a></dd></p>
         </dl><br />");}
 
  }
