@@ -286,6 +286,7 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
 //$query.=" AND i.id!=''";
            //$personnalisation=requete_where_order($where,$orderby);
            ($requete!='')?$personnalisation=$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
+           //--- gérer la mutualisation de requete avec tout rechercher : ajouter order =" ORDER BY statut ASC, severite DESC, urgence DESC";
            $query.=$personnalisation;
                         $query.=" LIMIT :offset,:length";// pagination
            // 4/ envoi

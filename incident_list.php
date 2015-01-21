@@ -79,49 +79,26 @@ if($debug===1){
     echo "<br />";
     // transmission : array(where,order_by);
 }
-    //---- preparation : WHERE
-    //@todo methode attendant un nombre inconnu d'argument
-    // si une valeur est vide, retirer OPTIMISATION
-    $where=array();// $where=array('severite'=>$severite,'urgence'=>$urgence,'statut'=>$statut);
-    if($severite!=''){
-        $where['severite']=$severite;
-    }
-    if($urgence!=''){
-        $where['urgence']=$urgence;
-    }
-    if($statut!=''){
-        $where['statut']=$statut;
-    }
+$where=preparation_where($severite,$urgence,$statut);// 01:where recupere
 if ($debug===1){
 echo "<br />retravail WHERE:";
 print_r($where);
 }
-    //---- preparation : ORDERBY
-    $orderby=array();// $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
-    if($tri_severite!=''){
-        $orderby['severite']=$tri_severite;
-    }
-    if($tri_urgence!=''){
-        $orderby['urgence']=$tri_urgence;
-    }
-    if($tri_statut!=''){
-        $orderby['statut']=$tri_statut;
-    }
+$orderby=preparation_orderby($tri_severite,$tri_urgence,$tri_statut);// 02:orderby recupere
 if ($debug===1){
 echo '<br />retravail ORDERBY:';
 print_r($orderby);
 //@todo offrir la possibilité de trimballer les options pour : remplir le formulaire de recherche (avec possibilité d'effacer)
 }   
-    
      /** seconde partie de la requete apres les champs, le filtre
       * 
       */
-     $result1=requete_personnalisee_where($where);// lib.php
+     $result1=requete_personnalisee_where($where);// 03:where requete
 if($debug===1){
 echo "<br />Requete WHERE";
 print($result1);
 }
-     $result2=requete_personnalisee_orderby($orderby);// lib.php
+     $result2=requete_personnalisee_orderby($orderby);// 04:orderby requete
         if($debug===1){
         echo "<br />Requete ORDERBY ";
         print($result2);
@@ -135,28 +112,22 @@ print($result1);
      * le propriétaire ou niveau d'accès sera à voir plus tard !
      */
      //concatenation des 2 requetes
-     //$result=requete_where_order($result1,$result2);//@TODO controler securite, surtout en pagination lib.php 
-     ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// requete depuis pagination
-        if($debug===1){//DEBUG non genant
-        echo 'requete concatenee :';
-        print($result);// PAGINATION-avancee a passer en formulaire
-        echo '<br />';
-        }
-     /** requete non preparee pour aller plus vite ?
-      * @todo requete préparée
-      */
-      
-        $display_array=$incident->count_n_incident_avancee($con,$result1,$result2,$requete);//@todo requete si pagination, compte total
-        $data=infos_pagination($display_array, $page);// OK compatible array-sgbd
-        if($debug===1){
-        print_r($display_array);
-        print_r($data);
-        }
+     ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// 05:where et orderby requete commune / OU requete depuis pagination
+            if($debug===1){//DEBUG non genant
+            echo 'requete concatenee :';
+            print($result);// PAGINATION-avancee a passer en formulaire
+            echo '<br />';
+            }
+        $display_array=$incident->count_n_incident_avancee($con,$result1,$result2,$requete);//06:total @todo requete si pagination, compte total
+        $data=infos_pagination($display_array, $page);// 07:infos pagination (nombre de pages,page demandée) OK compatible array-sgbd
+            if($debug===1){
+            print_r($display_array);
+            print_r($data);
+            }
         $nbre_pages=$data['nombre de pages'];
         $page_demandee=$data['page demandee'];
- 
- //--- charger la session pour export DEBUT -------------------------------------------------
- //$_SESSION['query']
+        
+ // 08:session charger la session pour export DEBUT -------------------------------------------------
  if($requete!=''){
 $_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination ou liste personnalisee
  }
@@ -164,32 +135,32 @@ $_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination o
  $_SESSION['query']=$result1.''.$result2;// si c'est une recherche avancee après formulaire
  }
  //--- charger la session pour export FIN -------------------------------------------------
-      
-    $requete=$incident->recherche_personnalisee($con,$result1,$result2,$page_demandee,$requete);//@todo requete incident.php
-//echo "<br />requete finie: ";
-//print_r($requete);// tolere d'afficher du texte
+    
+    $requete=$incident->recherche_personnalisee($con,$result1,$result2,$page_demandee,$requete);// 09:resultats
         if($debug===1){//DEBUG non genant
+        echo "<br />requete finie";
         echo '<pre>';
         print_r($requete);
         echo '</pre>';
         }
 
     if(is_array($requete)){// pour éviter de traiter du vide !
-    
-    
-    //<input type="hidden" name="act" value="recherche_avancee">// PAGINATION-avancee a passer en formulaire
-    $pages=menu_pagination($nbre_pages,$page_demandee);// OK compatible array-sgbd
+    //-- <input type="hidden" name="act" value="recherche_avancee">// PAGINATION-avancee a passer en formulaire
+    $pages=menu_pagination($nbre_pages,$page_demandee);//10:liste des pages OK compatible array-sgbd
         if($debug===1){
         echo "<br />pagination : ";
         print_r($pages);
         }
+//--- affichage DEBUT
+        // 11:affichage des liens avant resultat
           $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
           echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
           echo "<a href='incident_form.php?act=create'>en consigner un autre</a> | "; 
           echo "<a href='incident_list.php?act=export'>exporter tout</a></p>";//EXPORT passer tableau ou requete incident_export.php
+          display_pagination($pages,$display_array,'recherche_avancee',$result);// 12:affichage des pages
+    $incident->display_admin_n_incident($requete);// 13:affichage des resultats
           display_pagination($pages,$display_array,'recherche_avancee',$result);
-    $incident->display_admin_n_incident($requete);
-          display_pagination($pages,$display_array,'recherche_avancee',$result);
+//--- affichage FIN
     }
     else{
         echo "Aucun résultat : <a href='incident_form.php?act=create'>en consigner un</a>";//@bug fixed
@@ -206,44 +177,8 @@ elseif($act=='export'){
     print_r($data);
     echo "</pre>";
     }
-     function cleanData(&$str) //---- traitement export
-  {
-    $str = preg_replace("/\t/", "\\t", $str);
-    $str = preg_replace("/\r?\n/", "\\n", $str);
-    if(strstr($str, '"')) $str = '"' . str_replace('"', '""', $str) . '"';
-    $str= mb_convert_encoding($str, 'UCS-2LE','UTF-8');// INDISPENSABLE excel gère mal l'UTF-8
-  }
-
-  if($debug===1){
-   echo "<pre>";
-    print_r($data);
-    echo "</pre>";
-    exit();// empeche sortie du fichier
-  }
- 
-  $filename = "export_personnalise_" . date('Ymd') . ".xls";// nom de fichier
-  //echo b"\xEF\xBB\xBF";// BOM s'écrit et gene
-  $flag = false;
-  foreach($data as $row) {// boucle de sortie
-    if(!$flag) {
-      // affiche entete ou pas
-      $output.= implode("\t", array_keys($row)) . "\n";
-      $flag = true;
-    }
-    array_walk($row, 'cleanData');//nettoyage
-     $output.= implode("\t",array_values($row)) . "\n";
-  }
-
-  header("Content-Disposition: attachment; filename=\"$filename\"");// ne pas avoir de sortie avant
-  header("Content-Type: application/vnd.ms-excel");
-  header("Pragma: no-cache");
-  header("Cache-Control: must-revalidate, post-check=0, pre-check=0, public");
-  header("Expires: 0");
-  
-  echo $output;// sortie
-  
-  exit;
-    
+    exporter_vers_excel($data);
+    exit;
 }
 else{// par défaut
 $_SESSION['query']='';// permet de dire que ce n'est pas une recherche avancée: traduit en : export

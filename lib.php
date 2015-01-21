@@ -53,6 +53,24 @@
      return $return;
      }
     }
+    
+    /** recuperation de where
+     */
+    function preparation_where($severite,$urgence,$statut){    //---- preparation : WHERE
+        //@todo methode attendant un nombre inconnu d'argument
+        // si une valeur est vide, retirer OPTIMISATION
+        $where=array();// $where=array('severite'=>$severite,'urgence'=>$urgence,'statut'=>$statut);
+        if($severite!=''){
+            $where['severite']=$severite;
+        }
+        if($urgence!=''){
+            $where['urgence']=$urgence;
+        }
+        if($statut!=''){
+            $where['statut']=$statut;
+        }
+     return $where;   
+    }
     /** partie where de la requete depuis checkbox: (... OR ...) AND (... OR ...)
      *
      */
@@ -92,6 +110,22 @@
          }
          return $return;
      }
+    /** recuperation de orderby
+     */
+    function preparation_orderby($tri_severite,$tri_urgence,$tri_statut){
+        //---- preparation : ORDERBY
+        $orderby=array();// $orderby=array('tri_severite'=>$tri_severite,'tri_urgence'=>$tri_urgence);// ne pas s'embeter avec enlever le tri_
+        if($tri_severite!=''){
+            $orderby['severite']=$tri_severite;
+        }
+        if($tri_urgence!=''){
+            $orderby['urgence']=$tri_urgence;
+        }
+        if($tri_statut!=''){
+            $orderby['statut']=$tri_statut;
+        }
+        return $orderby;
+    }
      /** partie orderby de la requete depuis radio
       * 
       */
@@ -138,6 +172,7 @@
      }      
             return $return;
      }
+     
     /** filtrer un résultat et préparer la pagination
      *  @param[in] tableau à traiter, page demandée, 
      *  @global lignes par page
@@ -157,7 +192,7 @@
     $return['nombre de resultats']=$total;//echo "total : ".$total."<br />";
     		$nbre_pages=ceil($total/$lignes_par_page);// nombre de pages arrondi au supérieur POSITIF 1,1=2 MAIS -3,2=-3 
     $return['nombre de pages']=$nbre_pages;//echo "nombre de pages : ".$nbre_pages."<br />";		
-            $page = ($page < 1) ? 1 : $page;// si erreur avec 0 de mis, sinon demarrage à- lignes_par_page
+            $page = ($page < 1) ? 1 : $page;// si erreur avec 0 de mis, sinon demarrage à- lignes_par_page --------- TRANSMIS A REQUETE !
     $return['page demandee']=$page;//echo "page ".$page."<br />";
             $debut = ($page - 1) * ($lignes_par_page);// $show_per_page + 1 (3-1=2)*(3)
     			//echo "indice de demarrage dans tableau original : ".$start."<br />";
@@ -226,5 +261,59 @@
         }
         print("</form>
         ");
+    }
+    
+    /* act='recherche_avancee' 103 lignes, c'est trop
+    //function recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_urgence,$tri_statut,$requete)
+    $where=preparation_where($severite,$urgence,$statut);// 01:where recupere
+    $orderby=preparation_orderby($tri_severite,$tri_urgence,$tri_statut);// 02:orderby recupere
+    $result1=requete_personnalisee_where($where);// 03:where requete
+    $result2=requete_personnalisee_orderby($orderby);// 04:orderby requete
+    ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// 05:where et orderby requete commune / OU requete depuis pagination
+    // 08:session charger la session requete concatenee pour export
+    
+$display_array=$incident->count_n_incident_avancee($con,$result1,$result2,$requete);//06:total @todo requete si pagination, compte total
+    $data=infos_pagination($display_array, $page);// 07:infos pagination (nombre de pages,page demandée) OK compatible array-sgbd
+    $pages=menu_pagination($nbre_pages,$page_demandee);//  10:liste des pages OK compatible array-sgbd
+    
+$requete=$incident->recherche_personnalisee($con,$result1,$result2,$page_demandee,$requete);// 09:resultats
+    
+    // 11:affichage des liens avant resultat (display dans incident.php)
+    display_pagination($pages,$display_array,'recherche_avancee',$result);// 12:affichage des pages
+$incident->display_admin_n_incident($requete);// 13:affichage des resultats
+    */
+    
+    /** nettoyage pour export excel
+     * excel ne supporte pas utf-8
+     */
+    function cleanData(&$str) {
+    $str = preg_replace("/\t/", "\\t", $str);
+    $str = preg_replace("/\r?\n/", "\\n", $str);
+    if(strstr($str, '"')) $str = '"' . str_replace('"', '""', $str) . '"';
+    $str= mb_convert_encoding($str, 'UCS-2LE','UTF-8');// INDISPENSABLE excel gère mal l'UTF-8
+    }
+    /** export vers excel
+     *
+     */
+    function exporter_vers_excel($data){
+      $filename = "export_personnalise_" . date('Ymd') . ".xls";// nom de fichier
+      $flag = false;
+      foreach($data as $row) {// boucle de sortie
+        if(!$flag) {
+          // affiche entete ou pas
+          $output.= implode("\t", array_keys($row)) . "\n";
+          $flag = true;
+        }
+        array_walk($row, 'cleanData');//nettoyage DEPENDANCE
+         $output.= implode("\t",array_values($row)) . "\n";
+      }
+    
+      header("Content-Disposition: attachment; filename=\"$filename\"");// ne pas avoir de sortie avant
+      header("Content-Type: application/vnd.ms-excel");
+      header("Pragma: no-cache");
+      header("Cache-Control: must-revalidate, post-check=0, pre-check=0, public");
+      header("Expires: 0");
+      
+      echo $output;// sortie
     }
 ?>
