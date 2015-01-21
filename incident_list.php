@@ -61,7 +61,7 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     }
 }
 elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout est intégré
-if($debug===1){
+    if($debug===1){
    // WHERE ... AND ...
     echo "severite avant:";
     print_r($severite);// OR si plusieurs a l'interieur
@@ -79,46 +79,8 @@ if($debug===1){
     echo "<br />";
     // transmission : array(where,order_by);
 }
-$where=preparation_where($severite,$urgence,$statut);// 01:where recupere
-if ($debug===1){
-echo "<br />retravail WHERE:";
-print_r($where);
-}
-$orderby=preparation_orderby($tri_severite,$tri_urgence,$tri_statut);// 02:orderby recupere
-if ($debug===1){
-echo '<br />retravail ORDERBY:';
-print_r($orderby);
-//@todo offrir la possibilité de trimballer les options pour : remplir le formulaire de recherche (avec possibilité d'effacer)
-}   
-     /** seconde partie de la requete apres les champs, le filtre
-      * 
-      */
-     $result1=requete_personnalisee_where($where);// 03:where requete
-if($debug===1){
-echo "<br />Requete WHERE";
-print($result1);
-}
-     $result2=requete_personnalisee_orderby($orderby);// 04:orderby requete
-        if($debug===1){
-        echo "<br />Requete ORDERBY ";
-        print($result2);
-        echo "<br />";
-        }
-     /** @todo  pouvoir l'enregistrer, cad :
-     * V-00 la récupérer en array (au premier jeu)
-     * lui donner un nom sans accent ni apostrophe,virgule, espace
-     * la mettre en fichier de config
-     * la recherche est accessible par URL portant le nom
-     * le propriétaire ou niveau d'accès sera à voir plus tard !
-     */
-     //concatenation des 2 requetes
-     ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// 05:where et orderby requete commune / OU requete depuis pagination
-            if($debug===1){//DEBUG non genant
-            echo 'requete concatenee :';
-            print($result);// PAGINATION-avancee a passer en formulaire
-            echo '<br />';
-            }
-        $display_array=$incident->count_n_incident_avancee($con,$result1,$result2,$requete);//06:total @todo requete si pagination, compte total
+$result=recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_urgence,$tri_statut,$requete);
+        $display_array=$incident->count_n_incident_avancee($con,$result,$requete);//06:total @todo requete si pagination, compte total
         $data=infos_pagination($display_array, $page);// 07:infos pagination (nombre de pages,page demandée) OK compatible array-sgbd
             if($debug===1){
             print_r($display_array);
@@ -126,17 +88,7 @@ print($result1);
             }
         $nbre_pages=$data['nombre de pages'];
         $page_demandee=$data['page demandee'];
-        
- // 08:session charger la session pour export DEBUT -------------------------------------------------
- if($requete!=''){
-$_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination ou liste personnalisee
- }
- if(($result1!='')OR($result12='')){
- $_SESSION['query']=$result1.''.$result2;// si c'est une recherche avancee après formulaire
- }
- //--- charger la session pour export FIN -------------------------------------------------
-    
-    $requete=$incident->recherche_personnalisee($con,$result1,$result2,$page_demandee,$requete);// 09:resultats
+    $requete=$incident->recherche_personnalisee($con,$result,$page_demandee,$requete);// 09:resultats
         if($debug===1){//DEBUG non genant
         echo "<br />requete finie";
         echo '<pre>';
@@ -152,11 +104,7 @@ $_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination o
         print_r($pages);
         }
 //--- affichage DEBUT
-        // 11:affichage des liens avant resultat
-          $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
-          echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
-          echo "<a href='incident_form.php?act=create'>en consigner un autre</a> | "; 
-          echo "<a href='incident_list.php?act=export'>exporter tout</a></p>";//EXPORT passer tableau ou requete incident_export.php
+    $incident->display_lien_admin($display_array);// 11:affichage liens avant resultat
           display_pagination($pages,$display_array,'recherche_avancee',$result);// 12:affichage des pages
     $incident->display_admin_n_incident($requete);// 13:affichage des resultats
           display_pagination($pages,$display_array,'recherche_avancee',$result);
@@ -203,10 +151,7 @@ if($debug===1){
 echo "<br />pagination : ";
 print_r($pages);
 }
-          $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
-          echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
-          echo "<a href='incident_form.php?act=create'>en consigner un autre</a> | ";
-                    echo "<a href='incident_list.php?act=export'>exporter tout</a></p>";//EXPORT passer tableau ou requete
+    $incident->display_lien_admin($display_array);
 display_pagination($pages,$display_array,'','');
      $incident->display_admin_n_incident($result);
 display_pagination($pages,$display_array,'','');

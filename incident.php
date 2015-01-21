@@ -245,7 +245,7 @@ $query.=" AND i.id=:id";
               echo "Une erreur est survenue lors de la récupération";
             }
       }
-      function count_n_incident_avancee($connexion,$where,$orderby,$requete){
+      function count_n_incident_avancee($connexion,$result,$requete){// $where,$orderby,
           //$query="SELECT COUNT(*) FROM incident";
          $query="SELECT COUNT(i.id), i.resume, i.description, i.severite, i.urgence";
         $query.=", s.statut, s.date";//@todo avoir des id plus long :  , s.id as evenement s.id l'emportait sur i.id
@@ -255,7 +255,7 @@ $query.=" AND i.id=:id";
         $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
                     //$query.=" WHERE id!='' ";
                     //$personnalisation=requete_where_order($where,$orderby);
-                    ($requete!='')?$personnalisation=$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
+                    ($requete!='')?$personnalisation=$requete:$personnalisation=$result;// REQUETE fin=requete_where_order($where,$orderby)
                     $query.=$personnalisation;
             $flux= $connexion->prepare($query);
             $flux->setFetchMode(PDO::FETCH_ASSOC);	
@@ -269,7 +269,7 @@ $query.=" AND i.id=:id";
                         die('KO execution comptage avancee');
                     }
       }
-      function recherche_personnalisee($con,$where,$orderby,$page_demandee,$requete){
+      function recherche_personnalisee($con,$result,$page_demandee,$requete){//$where,$orderby
                         //LIMIT : $page_demandee
                         global $lignes_par_page;
                         $depart=($page_demandee*$lignes_par_page)-$lignes_par_page;
@@ -285,7 +285,7 @@ $query.=" ON s.id_incident=i.id";
 $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";// le dernier des statuts de l'incident
 //$query.=" AND i.id!=''";
            //$personnalisation=requete_where_order($where,$orderby);
-           ($requete!='')?$personnalisation=$requete:$personnalisation=requete_where_order($where,$orderby);// REQUETE
+           ($requete!='')?$personnalisation=$requete:$personnalisation=$result;// REQUETE requete_where_order($where,$orderby)
            //--- gérer la mutualisation de requete avec tout rechercher : ajouter order =" ORDER BY statut ASC, severite DESC, urgence DESC";
            $query.=$personnalisation;
                         $query.=" LIMIT :offset,:length";// pagination
@@ -313,10 +313,10 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
              echo "erreur au select";
          }
      }
-/** pour l'export : pas de limit
+ /** pour l'export : pas de limit
  * 
  */
-function recherche_personnalisee_tout($con,$requete){
+ function recherche_personnalisee_tout($con,$requete){
                         //LIMIT : $page_demandee
                         //global $lignes_par_page;
                         //$depart=($page_demandee*$lignes_par_page)-$lignes_par_page;
@@ -363,6 +363,16 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
          }
      }
 //----------------------- méthodes d'affichage --------------------------
+ /** liens avant affichage admin
+  *
+  */
+ function display_lien_admin($display_array){
+     // 11:affichage des liens avant resultat
+          $label=($display_array>1)?"incidents":"incident";// gérer le pluriel
+          echo "<div id=''><p>".$display_array." ".$label." | ";// mise en page 
+          echo "<a href='incident_form.php?act=create'>en consigner un autre</a> | "; 
+          echo "<a href='incident_list.php?act=export'>exporter tout</a></p>";//EXPORT passer tableau ou requete incident_export.php
+ }
  /** présentation du listing + header et footer
        * $type (admin avec liens modif / visiteur sans action)
        */

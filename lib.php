@@ -172,6 +172,50 @@
      }      
             return $return;
      }
+     /** INTEGRATION des fonctions precedentes
+      * 
+      */
+    function recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_urgence,$tri_statut,$requete){
+        global $debug;
+        $where=preparation_where($severite,$urgence,$statut);// 01:where recupere
+            if ($debug===1){
+            echo "<br />retravail WHERE:";
+            print_r($where);
+            }
+        $orderby=preparation_orderby($tri_severite,$tri_urgence,$tri_statut);// 02:orderby recupere
+            if ($debug===1){
+            echo '<br />retravail ORDERBY:';
+            print_r($orderby);
+            } 
+        $result1=requete_personnalisee_where($where);// 03:where requete
+            if($debug===1){
+            echo "<br />Requete WHERE";
+            print($result1);
+            }
+        $result2=requete_personnalisee_orderby($orderby);// 04:orderby requete
+            if($debug===1){
+            echo "<br />Requete ORDERBY ";
+            print($result2);
+            echo "<br />";
+            }
+        ($requete!='')?$result=$requete:$result=requete_where_order($result1,$result2);// 05:where et orderby requete commune / OU requete depuis pagination
+          if($debug===1){
+            echo "<br />Requete complete ";
+            print($result);
+            echo "<br />";              
+          }
+
+// 08:session charger la session pour export DEBUT -------------------------------------------------
+ if($requete!=''){
+$_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination ou liste personnalisee
+ }
+ if(($result1!='')OR($result12='')){
+ $_SESSION['query']=$result1.''.$result2;// si c'est une recherche avancee après formulaire
+ }
+ //--- charger la session pour export FIN -------------------------------------------------
+
+    return $result;
+    }
      
     /** filtrer un résultat et préparer la pagination
      *  @param[in] tableau à traiter, page demandée, 
@@ -263,7 +307,7 @@
         ");
     }
     
-    /* act='recherche_avancee' 103 lignes, c'est trop
+    /* act='recherche_avancee' 103 lignes, c'est trop: devient 54
     //function recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_urgence,$tri_statut,$requete)
     $where=preparation_where($severite,$urgence,$statut);// 01:where recupere
     $orderby=preparation_orderby($tri_severite,$tri_urgence,$tri_statut);// 02:orderby recupere
