@@ -4,7 +4,7 @@ require_once 'lib.php';// fonctions utiles
 require_once 'param.php';// paramètres de configuration fine : règles métiers
 
 //--- paramètres de connexion
-    $host = getHostByName(getHostName()); 'localhost';
+    $host = getHostByName(getHostName()); //'localhost';
     $port=3306;
     $username='';
     $password='';
