@@ -1,0 +1,59 @@
+//--- SQL en console
+
+mysql-ctl cli
+mysql> use c9
+mysql> source /home/ubuntu/workspace/php/sql-structure.sql // importer table (chemin complet pas nécessaire)
+
+mysql> show tables; // montrer table obligatoirement avec ; OK
+SHOW COLUMNS FROM incident; // visualisation des colonnes OK
+
+DROP TABLE incident; // supprimer la table et la structure
+TRUNCATE TABLE incident; // vider la table de ses données et mettre à jour l'auto-incrément
+DELETE FROM incident; // vider la table sans chnager l'auto-incrément
+
+ALTER TABLE incident MODIFY incident.resume varchar(255) NOT NULL; // modification de champ OK
+ALTER TABLE incident MODIFY COLUMN id INT(5) auto_increment; OK
+ALTER TABLE incident MODIFY urgence INT(2); // modification de champ OK
+
+ALTER TABLE incident ADD COLUMN description TEXT; // ajout de champ OK
+
+date : INSERT INTO statut set id_incident=2, date=20141006010101;
+
+//--- APACHE en console
+
+apachectl stop
+apachectl start
+
+//--- GIT en ligne de commande
+
+git init // créer un dépôt
+
+git add *.php // ajouter des fichiers : espaces entre fichiers
+git commit -m "version 00.00.01" // déclarer le commit "  "  et non '  ' voir leschangments
+git commit -a -m "version 00.00.01" // mettre à jour recuperer les changements (sinon, ne prend rien !)
+git ls-tree -r dev-01 --name-only // lister les fichiers suivis
+
+git remote add incident https://github.com/phpdudimanche/incident.git // déclarer le distant
+git remote -v // regarder les noms déclarés
+
+git rm statut.php // supprime physiquement :pb
+git checkout HEAD statut.php // récupère physiquement la page OK
+git rm --cached statut.php // enlever le distant, pas le local OK
+git log // liste des commits (comment sortir de la page ?)
+
+git commit -m "remove file1.txt" // suppression directe par poubelle depuis git
+git remove //juste enlevé des historiques
+
+git push incident master // transmettre le commit local au dépôt distant
+git push incident dev-01
+git push incident dev-01:master;// MAJ à distance : git push <remote> <local branch name>:<remote branch to push into>
+
+git tag V-00.00.01 77da938146 // mettre un tag sur un n° de commit
+git tag -a V-00.00.02 -m 'finalise ni optimise ni nettoye' be21195 // avoir commité et récupéré le id
+git tag // lister les tags
+git push incident --tags // déposer les tags : ne pas oublier de préciser le dépôt distant
+git tag -d V-00.00.02 //supprimer tag (car comment assigner après coup ?)
+
+git branch // dans quelle branche je suis (* l'indique)
+git branch dev-01 // nouvelle branche
+git checkout dev-01 // travail sur la nouvelle branche
