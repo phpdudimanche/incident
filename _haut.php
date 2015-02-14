@@ -43,19 +43,23 @@ $urgence_avancee=choisir_avancee('urgence','urgence');
 print($urgence_avancee);
 $statut_avancee=choisir_avancee('statut','statut');
 print($statut_avancee);
-echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
+echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p>
+</form>
+';
 
-echo '<form id="sauvees" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_avancee">';
+echo '<form id="sauvees" action="incident_list.php" method="post"><input type="hidden" name="act" value="recherche_personnalisee">';
 //echo 'liste des requetes';
 $taille=sizeof($recherche_personnalisee);
 //echo $taille;
 echo '<p class="important">';
 for($i=0; $i<$taille; $i++){
    echo '<label for="'.$i.'" class="important">'.$recherche_personnalisee[$i]['titre'].'';
-   echo "<input type='radio' name='requete' id='".$i."' value='".serialize($recherche_personnalisee[$i]['recherche'])."'></label>";//serialize impose " et non '
+   echo "<input type='radio' name='requete' id='".$i."' value='".$i."'></label>";//serialize impose '"..."'  " et non ' = serialize($recherche_personnalisee[$i]['recherche'])
 }
 echo '</p>';
-echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p></form>';
+echo '<p class="action"><a href="#fermer">fermer</a> <input type="submit" value="go" /></p>
+</form>
+';
 ?>
 
 

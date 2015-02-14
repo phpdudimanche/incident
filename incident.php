@@ -256,6 +256,7 @@ $query.=" AND i.id=:id";
                     //$query.=" WHERE id!='' ";
                     //$personnalisation=requete_where_order($where,$orderby);
                     ($requete!='')?$personnalisation=$requete:$personnalisation=$result;// REQUETE fin=requete_where_order($where,$orderby)
+// si requete existe la prendre, sinon prendre result
                     $query.=$personnalisation;
             $flux= $connexion->prepare($query);
             $flux->setFetchMode(PDO::FETCH_ASSOC);	
@@ -484,7 +485,7 @@ $query.=" WHERE s.id=(SELECT MAX(s.id) FROM statut s WHERE s.id_incident=i.id)";
         <p><dt>Statuts :</dt><dd>".$severite_label." - ".$urgence_label." - ".$statut_label."</dd></p>
         <p><dt>Description :</dt><dd>".$result[0]['description']."</dd></p>
         <p><dt>Actions :</dt><dd><a href='incident_form.php?act=update&id=".$result[0]['id']."'>modifier</a>
-         | <a href='incident_act.php?act=delete&id=".$result[0]."'>supprimer</a></dd></p>
+         | <a href='incident_act.php?act=delete&id=".$result[0]['id']."'>supprimer</a></dd></p>
         </dl><br />");}
 
  }

@@ -13,7 +13,7 @@ array('titre'=>'le moins urgent pour le testeur','recherche'=>'AND (severite=10)
 array('titre'=>'à relivrer pour le <b>fournisseur</b>','recherche'=>'AND (statut=100) ORDER BY severite desc')
 );// assigner des recherches par droit
 //------------------ divers --------------------------
-$lignes_par_page=2;
+$lignes_par_page=1;
 $max_liens_pages=2;
 
 

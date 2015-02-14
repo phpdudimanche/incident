@@ -33,14 +33,16 @@
         $array=$$la_liste;
   
     $return='
-            <p class="severite"><label class="utile">
-            '.$name.' : ';
+            <p class="severite">
+             <label class="utile">'.$name.' : ';
     $return.='<input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="asc" title="asc">
-              <input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="desc" title="desc" ></label>';// problème des labels for
+              <input type="radio" name="tri_'.$type.'" id="tri_'.$type.'" value="desc" title="desc" >
+              </label>';// problème des labels for
           foreach($array as $key => $value){
     $return.='<label><input type="checkbox" name="'.$type.'['.$key.']" />'.$value.'</label><br />';
           }
-    $return.='</p>'; // bas
+    $return.='</p>
+            '; // bas
     return $return;
  }
     /** afficher le statut
@@ -288,10 +290,12 @@ $_SESSION['query']=$requete;// si c'est une recherche avancee apres pagination o
     function display_pagination($pages,$display_array,$action,$requete){
         // $pages:menu_pagination $display_array:donnees completes si requete sans limit, recherche_avancee si action
         print("<form id='pagination' name='pagination' action='".$_SERVER['PHP_SELF']."' method='post'>
-        <input type='hidden' name='donnees' id='donnees' value='".serialize($display_array)."'>
-        <input type='hidden' name='requete' id='requete' value='".serialize($requete)."'>
         <input type='hidden' name='act' value='".$action."'>
         ");// passer array en serialize
+        /* TOUT FAIRE PASSER EN SESSION
+        <input type='hidden' name='donnees' id='donnees' value='".serialize($display_array)."'>
+        <input type='hidden' name='requete' id='requete' value='".serialize($requete)."'>
+        */
         foreach($pages as $key=>$value){
         	if(strstr($value,"'")){// page en cours avec '...'
         	//echo "valeur:".$value;

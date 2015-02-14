@@ -10,7 +10,8 @@ isset($_REQUEST['tri_severite'])?$tri_severite=$_REQUEST['tri_severite']:$tri_se
 isset($_REQUEST['tri_urgence'])?$tri_urgence=$_REQUEST['tri_urgence']:$tri_urgence='';
 isset($_REQUEST['tri_statut'])?$tri_statut=$_REQUEST['tri_statut']:$tri_statut='';
 isset($_REQUEST['page'])?$page=$_REQUEST['page']:$page='';
-isset($_POST['requete'])?$requete=unserialize($_POST['requete']):$requete='';
+isset($_POST['requete'])?$requete=$_POST['requete']:$requete='';//unserialize($_POST['requete'])
+
 
 /** NEW : session
  * 1/ pour : incident_list.php?act=export
@@ -20,11 +21,17 @@ isset($_POST['requete'])?$requete=unserialize($_POST['requete']):$requete='';
  */
 session_start();
 isset($_SESSION['query'])?$export=$_SESSION['query']:$export='';// recuperation de ce qu'il faut exporter
+//isset($_SESSION['query'])?$export=$_SESSION['query']:$export='';// recuperation de toute requete paginee
 
 $title='Affichage d\'incident';
 
     require_once 'incident.php';
     $incident = new incident;
+   
+if(($requete!='') AND ($act='recherche_personnalisee')){//differencier recherche_avancee et recherche_personnalisee
+    $requete=$recherche_personnalisee[$requete]['recherche'];
+    // allouer la requete de recherche personnalisee du form
+}
     
         if($act=='export'){
           // pas de sortie  
@@ -32,8 +39,8 @@ $title='Affichage d\'incident';
         else{
         require_once '_haut.php';
         print("
-        <h1>$title</h1>
-        ");
+        <h1>$title</h1>$export
+        ");//$requete
         }
         
 if ($act=='list'){// liste de N incidents ATTENTION, n'est plus utilisé
@@ -60,11 +67,9 @@ elseif($act=='view'){// vue non modifiable sur 1 incident imprimable
     $incident->display_vue_incident($result);
     }
 }
-elseif($act=='recherche_avancee'){//@todo mettre dans incident.php dès que tout est intégré
-/*echo "Action : ".$act."<br/>";
-echo "Requete depuis pagination : ".$requete;
-exit();*/
-    if($debug===1){
+elseif(($act=='recherche_avancee') OR ($act=='recherche_personnalisee')){
+
+    if($debug===1){//--- RECHERCHE AVANCEEE
    // WHERE ... AND ...
     echo "severite avant:";
     print_r($severite);// OR si plusieurs a l'interieur
@@ -83,6 +88,11 @@ exit();*/
     // transmission : array(where,order_by);
 }
 $result=recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_urgence,$tri_statut,$requete);
+//avant requete, provenance RECHERCHE AVANCEE
+//l.32 requete peut être RECHERCHE PERSONNALISEE
+//sinon peut etre en form en cas de pagination [ENLEVER]
+
+
         $display_array=$incident->count_n_incident_avancee($con,$result,$requete);//06:total @todo requete si pagination, compte total
         $data=infos_pagination($display_array, $page);// 07:infos pagination (nombre de pages,page demandée) OK compatible array-sgbd
             if($debug===1){
@@ -108,9 +118,9 @@ $result=recherche_avancee_requete($severite,$urgence,$statut,$tri_severite,$tri_
         }
 //--- affichage DEBUT
     $incident->display_lien_admin($display_array);// 11:affichage liens avant resultat
-          display_pagination($pages,$display_array,'recherche_avancee',$result);// 12:affichage des pages
+          display_pagination($pages,$display_array,$act,$result);// 12:affichage des pages
     $incident->display_admin_n_incident($requete);// 13:affichage des resultats
-          display_pagination($pages,$display_array,'recherche_avancee',$result);
+          display_pagination($pages,$display_array,$act,$result);
 //--- affichage FIN
     }
     else{
