@@ -32,6 +32,7 @@ git init // créer un dépôt
 git add *.php // ajouter des fichiers : espaces entre fichiers
 git commit -m "version 00.00.01" // déclarer le commit "  "  et non '  ' voir leschangments
 git commit -a -m "version 00.00.01" // mettre à jour recuperer les changements (sinon, ne prend rien !)
+--no-verify //desactiver hook pre-commit
 git ls-tree -r dev-01 --name-only // lister les fichiers suivis
 
 git remote add incident https://github.com/phpdudimanche/incident.git // déclarer le distant
