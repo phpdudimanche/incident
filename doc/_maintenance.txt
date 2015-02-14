@@ -1,4 +1,4 @@
-//--- SQL en console
+﻿//--- SQL en console
 
 mysql-ctl cli
 mysql> use c9
@@ -27,6 +27,7 @@ apachectl start
 //--- GIT en ligne de commande
 
 git init // créer un dépôt
+.gitignore // sur windows : renommer par console = ren gitignore.txt .gitignore
 
 git add *.php // ajouter des fichiers : espaces entre fichiers
 git commit -m "version 00.00.01" // déclarer le commit "  "  et non '  ' voir leschangments
