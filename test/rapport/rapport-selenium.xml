@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="ihm" tests="6" assertions="10" failures="0" errors="0" time="199.132037">
+    <testsuite name="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" tests="6" assertions="10" failures="0" errors="0" time="199.132037">
+      <testsuite name="interfaceTest: IE on Windows" tests="6" assertions="10" failures="0" errors="0" time="199.132037">
+        <testcase name="testEtatDesLieux" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="77" assertions="1" time="29.166465"/>
+        <testcase name="testCreer" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="84" assertions="2" time="37.146097"/>
+        <testcase name="testRechercher_par_id" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="117" assertions="1" time="29.519775"/>
+        <testcase name="testRecherchercher_sauvegardee" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="125" assertions="2" time="27.281482"/>
+        <testcase name="testModifier_par_liste" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="138" assertions="1" time="36.080616"/>
+        <testcase name="testSupprimer" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="150" assertions="3" time="39.937602"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

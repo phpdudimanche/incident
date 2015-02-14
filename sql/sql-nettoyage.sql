@@ -1,0 +1,2 @@
+TRUNCATE TABLE `incident`;
+TRUNCATE TABLE `statut`;

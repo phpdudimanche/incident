@@ -1,0 +1,17 @@
+<phpunit>
+<selenium>
+<browser name="IE on Windows" browser="chrome"/>
+</selenium>
+<php>
+<env name="DOMAIN" value="http://localhost:8080/dev-01/"/>
+<env name="RACINE" value="D:\code-source\dev-01\"/>
+</php>
+<logging>
+<log type="junit" target="D:\code-source\dev-01\test\rapport\rapport-selenium.xml"/>
+</logging>
+<testsuites>
+<testsuite name="ihm">
+<file>interfaceTest.php</file>
+</testsuite>
+</testsuites>
+</phpunit>
