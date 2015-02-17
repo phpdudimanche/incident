@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="ihm" tests="6" assertions="10" failures="0" errors="0" time="196.925349">
-    <testsuite name="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" tests="6" assertions="10" failures="0" errors="0" time="196.925349">
-      <testsuite name="interfaceTest: IE on Windows" tests="6" assertions="10" failures="0" errors="0" time="196.925349">
-        <testcase name="testEtatDesLieux" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="68" assertions="1" time="23.831755"/>
-        <testcase name="testCreer" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="75" assertions="2" time="39.573326"/>
-        <testcase name="testRechercher_par_id" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="108" assertions="1" time="29.197322"/>
-        <testcase name="testRecherchercher_sauvegardee" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="116" assertions="2" time="28.331470"/>
-        <testcase name="testModifier_par_liste" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="129" assertions="1" time="37.348575"/>
-        <testcase name="testSupprimer" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="141" assertions="3" time="38.642901"/>
+  <testsuite name="ihm" tests="1" assertions="1" failures="0" errors="0" time="27.857477">
+    <testsuite name="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" tests="1" assertions="1" failures="0" errors="0" time="27.857477">
+      <testsuite name="interfaceTest: IE on Windows" tests="1" assertions="1" failures="0" errors="0" time="27.857477">
+        <testcase name="testEtatDesLieux" class="interfaceTest" file="D:\code-source\dev-01\test\test-selenium\interfaceTest.php" line="70" assertions="1" time="27.857477"/>
       </testsuite>
     </testsuite>
   </testsuite>

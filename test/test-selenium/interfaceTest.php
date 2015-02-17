@@ -42,7 +42,9 @@ protected $screenshotUrl = "http://localhost:8080/dev-01/";
 	  $this->setBrowserUrl(getenv('DOMAIN'));// l'avoir lancé avant
 	}
 	// nettoyage base
-	//public static function tearDownAfterClass(){
+	/*public static function tearDownAfterClass(){
+		$this->open("http://localhost:4444/selenium-server/driver?cmd=shutDownSeleniumServer");
+	}*/
 	protected function tearDown(){// boucle BROWSER
 	//--- paramètres de connexion
     $host = 'localhost';//getHostByName(getHostName()); 'localhost';
@@ -69,7 +71,7 @@ protected $screenshotUrl = "http://localhost:8080/dev-01/";
     $this->open("incident_list.php");
 	$this->waitForPageToLoad("30000");
     $this->assertTrue($this->isTextPresent("Affichage d'incident"));    
-  }
+  }/*
   //----- CREATE --------------------------------------------
   // filtrer moyen et urgent, ne rien trouver, créer, filtrer,trouver
   public function testCreer(){
@@ -162,7 +164,7 @@ protected $screenshotUrl = "http://localhost:8080/dev-01/";
 	 $this->waitForPageToLoad("30000");
 
 	 $this->assertContains("Aucun", $this->getText("css=body"));	 
-  }
+  }*/
   
  
 }

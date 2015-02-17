@@ -30,6 +30,17 @@
 - Version 0 sans multiprojet : une installation par projet.
 - Version 0 sans paramétrage par IHM ni adaptation aux catégories.
 
+## Optimisé pour les tests :
+- Dossier test
+ 	- Un dossier par type de test : "test-selenium", (test-phpunit, test-dbunit...)
+ 	- Un dossier "rapport" pour chaque rapport de type Junit : rapport-selenium.xml
+ 	- Un fichier "index.php" qui va lire les rapports XML
+ 	- Un dossier "lanceur" : 
+ 		- pour git : hook git pre-commit,
+ 		- pour les batchs windows (8.1) : run.bat
+ 		- pour ant : ant-bat.xml (simple lanceur du run.bat), ant-cmd.xml (palliatif aux bats) 
+ 		- pour les autres outils (config maven config  grunt, config phing)
+
 ## Installation :
-- Les scripts sql sont fournis.
+- Les scripts sql sont fournis dans le dossier sql qui dispose d'un lanceur html.
 - Le fichier de configuration "_config.php" est à renommer "config.php".
