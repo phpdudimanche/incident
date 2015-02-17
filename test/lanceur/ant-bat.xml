@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+"C:\Program Files\apache-ant-1.9.2\bin" // depuis l'emplacement bin de ant, clic droit
+ant -f D:\code-source\dev-01\test\lanceur\ant-bat.xml // commande suivante
+-->
+<!-- cible par défaut -->
+<project name="selenium" default="bat">
+
+<target name="bat">
+  <exec executable="cmd">
+    <arg value="/c"/>
+    <arg value="D:\code-source\dev-01\test\lanceur\run.bat"/>
+    <arg value="-p"/>
+  </exec>
+</target>
+
+</project>

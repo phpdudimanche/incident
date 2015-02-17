@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+"C:\Program Files\apache-ant-1.9.2\bin" // depuis l'emplacement bin de ant, clic droit
+ant -f D:\code-source\dev-01\test\lanceur\ant-cmd.xml // commande suivante
+-->
+<!-- cible par défaut -->
+<project name="selenium" default="all">
+
+<target name="start">
+<echo>start</echo>
+  <exec executable="cmd">
+    <arg value="/c"/>
+    <arg value="java -jar D:\selenium\selenium-server-standalone-2.43.1.jar" />
+    <arg value="-p"/>
+  </exec>
+</target>
+
+<target name="phpunit">
+<echo>test</echo>
+<exec executable="cmd">
+<arg value="/c"/>
+<arg line="D:\UniServerZ\core\php54\php.exe D:\TEST-PHP\vendor\phpunit\phpunit\phpunit --configuration D:\code-source\dev-01\test\test-selenium"/>
+</exec>
+</target>
+
+<target name="stop">
+<echo>stop</echo>
+  <exec executable="cmd">
+    <arg value="/c"/>
+    <arg value="start http://localhost:4444/selenium-server/driver?cmd=shutDownSeleniumServer" />
+    <arg value="-p"/>
+  </exec>
+</target>
+
+<target name="wait">
+<sleep seconds="60"/>
+</target>
+
+<target name="close">
+<exec executable="cmd">
+<arg value="/c"/>
+<arg line="TASKKILL /IM chrome.exe /F" />
+</exec>
+</target>
+
+<!-- enchainement de cibles -->
+<target name="all" depends="start,phpunit,stop,wait,close"/>
+
+</project>

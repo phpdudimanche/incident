@@ -1,0 +1,3 @@
+#!/usr/bin/php
+<?php
+exec('D:\code-source\dev-01\test\lanceur\run.bat');
